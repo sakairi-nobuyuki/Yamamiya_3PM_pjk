@@ -9,16 +9,33 @@ import pprint
 class DetectPlum:
     def __init__(self):
         #super().__init__()
-        self.raw_sample_path = 'raw_samples'
+        self.raw_sample_path = 'validation_g_img_search'
         self.img_path_list = glob.glob ('{}/*.jpg'.format (self.raw_sample_path))
         self.img_list = []
         #print (self.img_path_list)
         #self.load_img ()
-        self.dest_dir_path  = 'rect_samples'
+        self.dest_dir_path  = 'validation_g_img_search'
 
-        if os.path.exists (self.dest_dir_path):
-            shutil.rmtree (self.dest_dir_path)
-        os.makedirs (self.dest_dir_path)
+        #if os.path.exists (self.dest_dir_path):
+        #    shutil.rmtree (self.dest_dir_path)
+        #os.makedirs (self.dest_dir_path)
+
+        if os.path.exists (self.dest_dir_path) == False:
+            os.makedirs (self.dest_dir_path)
+        
+    def shift_jpg2png (self):
+        for img_path in self.img_path_list:
+            ext_name = os.path.basename (img_path).split ('.') [1]
+            print ("file name: {}, ext: {}".format (os.path.basename (img_path), ext_name))
+
+            img = cv2.imread (img_path)
+
+            new_img_path = self.rename_bbox_file (img_path)
+
+            print ("changed to png: ", new_img_path)
+            #if os.path.basename (img_path).split ('.') [1] == 'jpg':
+
+            cv2.imwrite (new_img_path, img)
 
     def load_img (self):
         for img_path in self.img_path_list:
@@ -27,7 +44,6 @@ class DetectPlum:
             print ('load file: {}\n  w, h = {}, {}'.format (os.path.basename (img_path), img.shape[0], img.shape[1]))
 
     def find_plum_in_raw_img (self):
-
         #for img in self.img_list:
         for img_path in self.img_path_list:
             img = cv2.imread (img_path)
@@ -59,7 +75,8 @@ class DetectPlum:
 
 if __name__ == '__main__':
     plum_detect = DetectPlum ()
-    plum_detect.find_plum_in_raw_img ()
+    plum_detect.shift_jpg2png ()
+    #    plum_detect.find_plum_in_raw_img ()
 
 
 
