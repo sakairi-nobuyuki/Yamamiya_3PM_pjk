@@ -1,0 +1,96 @@
+version: "3"
+services:
+  # ubuntu-base:
+  cuda-cudnn-base:
+    build: 
+      context: .
+      target: cuda-cudnn-base
+      # target: ubuntu-base
+      args:
+        - USER_NAME=${USER_NAME}
+        - GROUP_NAME=${GROUP_NAME}
+        - UID=${UID}
+        - GID=${GID}
+    image: cuda-cudnn-base:latest
+    # image: ubuntu-base:latest
+  ros2-base:
+    build: 
+      context: .
+      target: ros2-base
+      args:
+        - USER_NAME=${USER_NAME}
+        - GROUP_NAME=${GROUP_NAME}
+        - UID=${UID}
+        - GID=${GID}
+        - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+        - ROS_LOCALHOST_ONLY=${ROS_LOCALHOST_ONLY}
+    image: ros2-base:latest
+  cuda-ros2-base:
+    build: 
+      context: .
+      target: cuda-ros2-base
+      args:
+        - USER_NAME=${USER_NAME}
+        - GROUP_NAME=${GROUP_NAME}
+        - UID=${UID}
+        - GID=${GID}
+        - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+        - ROS_LOCALHOST_ONLY=${ROS_LOCALHOST_ONLY}
+    image: cuda-ros2-base:latest
+  cuda-ros2:
+    build: 
+      context: .
+      target: cuda-ros2
+      args:
+        - USER_NAME=${USER_NAME}
+        - GROUP_NAME=${GROUP_NAME}
+        - UID=${UID}
+        - GID=${GID}
+        - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+        - ROS_LOCALHOST_ONLY=${ROS_LOCALHOST_ONLY}
+    image: cuda-ros2:latest
+  cuda-ros2-python-base:
+    build: 
+      context: .
+      target: cuda-ros2-python-base
+      args:
+        - USER_NAME=${USER_NAME}
+        - GROUP_NAME=${GROUP_NAME}
+        - UID=${UID}
+        - GID=${GID}
+        - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+        - ROS_LOCALHOST_ONLY=${ROS_LOCALHOST_ONLY}
+    image: cuda-ros2-python-base:latest
+  yamamiya-pm:
+    container_name: yamamiya-pm
+    image: yamamiya-pm
+    build:
+      context: .
+      target: yamamiya-pm
+      args:
+        - USER_NAME=${USER_NAME}
+        - GROUP_NAME=${GROUP_NAME}
+        - UID=${UID}
+        - GID=${GID}
+        - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
+        - ROS_LOCALHOST_ONLY=${ROS_LOCALHOST_ONLY}
+        - WORKSPACE_DIR=${WORKSPACE_DIR}
+        - MINIO_ENDPOINT_URL=${MINIO_ENDPOINT_URL}
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+       - /tmp/.X11-unix:/tmp/.X11-unix
+       - $HOME/.Xauthority/:/root/.Xauthority
+       - ${WORKSPACE_DIR}:/home/${USER_NAME}/app/
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    tty: true
+    user: "${UID}:${GID}"
+    ports:
+      - "8000:8888"
+      - "8001:8001"
