@@ -75,9 +75,12 @@ services:
         - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
         - ROS_LOCALHOST_ONLY=${ROS_LOCALHOST_ONLY}
         - WORKSPACE_DIR=${WORKSPACE_DIR}
-        - MINIO_ENDPOINT_URL=${MINIO_ENDPOINT_URL}
-    environment:
-      - DISPLAY=${DISPLAY}
+        - ENDPOINT_URL=${ENDPOINT_URL}
+    devices:
+        - /dev/video0:/dev/video0
+#    environment:
+#      - DISPLAY=${ENDPOINT_URL}:0
+#      - LIBGL_ALWAYS_INDIRECT=""
     volumes:
        - /tmp/.X11-unix:/tmp/.X11-unix
        - $HOME/.Xauthority/:/root/.Xauthority
