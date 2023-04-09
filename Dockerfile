@@ -108,6 +108,11 @@ RUN poetry config virtualenvs.create false && \
 
 
 # configure the ros environment
+### for WSL case
+ARG ENDPOINT_URL=${ENDPOINT_URL}
+ENV DISPLAY=${ENDPOINT_URL}:0
+RUN export DISPLAY=${ENDPOINT_URL}:0
+#RUN sudo chmod 777 /dev/video*
 
 # COPY .  ${HOME}/app
 #RUN sudo chown -R ${USER_NAME} ${HOME}  && sudo chmod -R 777 ${HOME}
