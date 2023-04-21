@@ -140,3 +140,7 @@ db/migrations/versions/
 .vscode
 
 database/data
+
+### ROS
+install/
+log/

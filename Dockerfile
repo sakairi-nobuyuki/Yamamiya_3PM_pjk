@@ -33,7 +33,7 @@ RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o 
     echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/ros2.list > /dev/null
 
 RUN sudo apt update && sudo apt upgrade -y && \
-    sudo apt install -y --no-install-recommends ros-humble-desktop ros-dev-tools &&\
+    sudo apt install -y --no-install-recommends ros-humble-desktop ros-dev-tools ros-humble-usb-cam xvfb &&\
     #DEBIAN_FRONTEND=noninteractive sudo apt install -y --no-install-recommends ros-humble-desktop ros-dev-tools &&\
     sudo rm -rf /var/lib/apt/lists/*
 
@@ -101,13 +101,19 @@ COPY ./pyproject.toml ${HOME}/app
 COPY ./poetry.lock ${HOME}/app
 
 ### install python dependencies
-RUN poetry config virtualenvs.create false
-RUN poetry config installer.parallel false
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
-RUN pip3 install -r requirements.txt --user --no-deps
+RUN poetry config virtualenvs.create false && \
+    poetry config installer.parallel false && \
+    poetry export -f requirements.txt --output requirements.txt --without-hashes && \
+    pip3 install -r requirements.txt --user --no-deps
 
 
 # configure the ros environment
+### for WSL case
+ARG ENDPOINT_URL=${ENDPOINT_URL}
+ENV DISPLAY=${ENDPOINT_URL}:0
+RUN export DISPLAY=${ENDPOINT_URL}:0
+#RUN sudo chmod 777 /dev/video*
+
 # COPY .  ${HOME}/app
 #RUN sudo chown -R ${USER_NAME} ${HOME}  && sudo chmod -R 777 ${HOME}
 #COPY ./ros_start_up.sh  ${HOME}/app/scripts
