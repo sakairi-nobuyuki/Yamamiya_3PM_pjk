@@ -1,11 +1,14 @@
 from setuptools import setup
 
-package_name = 'yamamiya_pm'
+package_name = 'recognizer'
 
 setup(
     name=package_name,
     version='0.0.0',
-    packages=[package_name],
+    packages=[package_name,
+        "recognizer/components/streamer",
+        "recognizer/io", "recognizer/pipelines/data_collection"
+    ],
     data_files=[
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
@@ -20,6 +23,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            "image_streaming_node = recognizer.image_streaming_node:main"
         ],
     },
 )
