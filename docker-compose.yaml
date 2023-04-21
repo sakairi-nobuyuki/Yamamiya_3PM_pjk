@@ -79,6 +79,7 @@ services:
     devices:
         - /dev/video0:/dev/video0
     environment:
+      - ENDPOINT_URL=${ENDPOINT_URL}
       - DISPLAY=${ENDPOINT_URL}:0
 #      - LIBGL_ALWAYS_INDIRECT=""
     volumes:
@@ -107,7 +108,7 @@ services:
     command: -c "/opt/bin/minio server /export --address :9999 --console-address :9001;
       mkdir -p /data/.minio.sys/buckets;
       cp -r /policies/* /data/.minio.sys/;
-      /usr/bin/minio server /data"
+      /usr/bin/minio server /data"j
     volumes:
       - ./data:/export
       - ./minio/policies:/policies
