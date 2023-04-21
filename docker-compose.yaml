@@ -75,9 +75,13 @@ services:
         - ROS_DOMAIN_ID=${ROS_DOMAIN_ID}
         - ROS_LOCALHOST_ONLY=${ROS_LOCALHOST_ONLY}
         - WORKSPACE_DIR=${WORKSPACE_DIR}
-        - MINIO_ENDPOINT_URL=${MINIO_ENDPOINT_URL}
+        - ENDPOINT_URL=${ENDPOINT_URL}
+    devices:
+        - /dev/video0:/dev/video0
     environment:
-      - DISPLAY=${DISPLAY}
+      - ENDPOINT_URL=${ENDPOINT_URL}
+      - DISPLAY=${ENDPOINT_URL}:0
+#      - LIBGL_ALWAYS_INDIRECT=""
     volumes:
        - /tmp/.X11-unix:/tmp/.X11-unix
        - $HOME/.Xauthority/:/root/.Xauthority
@@ -94,3 +98,21 @@ services:
     ports:
       - "8000:8888"
       - "8001:8001"
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    environment:
+      MINIO_ROOT_USER: sigma-chan
+      MINIO_ROOT_PASSWORD: sigma-chan-dayo
+    entrypoint: bash
+    command: -c "/opt/bin/minio server /export --address :9999 --console-address :9001;
+      mkdir -p /data/.minio.sys/buckets;
+      cp -r /policies/* /data/.minio.sys/;
+      /usr/bin/minio server /data"j
+    volumes:
+      - ./data:/export
+      - ./minio/policies:/policies
+      - ./minio/config:/root/.minio
+    ports:
+      - "9000:9999"
+      - "9001:9001"

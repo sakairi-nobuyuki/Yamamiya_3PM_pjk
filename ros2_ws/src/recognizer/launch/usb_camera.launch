@@ -1,0 +1,5 @@
+<launch>
+    <node name="usb_camera" pkg="usb_cam" type="usb_cam_exe" output="screen">
+        <param name="framerate" value="10"/>
+    </node>
+</launch>
