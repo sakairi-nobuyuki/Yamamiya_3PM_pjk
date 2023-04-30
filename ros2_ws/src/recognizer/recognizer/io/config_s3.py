@@ -2,9 +2,11 @@
 import boto3
 import cv2
 import numpy as np
+import yaml
+from typing import Dict
 from . import IOTemplate
 
-class S3ImageIO(IOTemplate):
+class S3ConfigIO(IOTemplate):
     def __init__(self, endpoint_url: str, access_key: str, secret_key: str, bucket_name: str) -> None:
         """
         Initializes S3Image class with access_key, secret_key and bucket_name.
@@ -41,22 +43,25 @@ class S3ImageIO(IOTemplate):
             file_names.append(obj.key)
         return file_names
 
-    def save(self, image: np.ndarray, key: str) -> dict:
+    def save(self, input: Dict[str, str], key: str) -> None:
         """
-        Saves an image to S3 bucket.
+        Saves a dict to S3 bucket.
 
         Parameters:
-        image (np.ndarray): Image to be saved.
-        key (str): Key under which the image will be saved.
+        input (Dict[str]): Dict to be saved.
+        key (str): Key under which the dict will be saved.
 
         Returns:
         dict: Response from S3 bucket.
         """
-        _, img_encoded = cv2.imencode('.png', image)
-        response = self.bucket.put_object(Key=key, Body=img_encoded.tostring())
+        yaml_dict = yaml.dump(input)
+
+        response = self.bucket.put_object(Key=key, Body=yaml_dict)
+
         return response
 
-    def load(self, key: str) -> np.ndarray:
+
+    def load(self, key: str) -> Dict[str, str]:
         """
         Loads an image from S3 bucket.
 
@@ -68,10 +73,9 @@ class S3ImageIO(IOTemplate):
         """
         obj = self.bucket.Object(key=key)
         response = obj.get()
-        file_stream = response['Body']
-        file_bytes = np.asarray(bytearray(file_stream.read()), dtype=np.uint8)
-        image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
-        return image
+        loaded_yaml = yaml.safe_load(response['Body'])
+
+        return loaded_yaml
 
     def delete(self, key: str) -> None:
         """
@@ -81,3 +85,6 @@ class S3ImageIO(IOTemplate):
         key (str): File to be deleted
         """
         self.bucket.objects.filter(Prefix="key").delete()
+
+
+    

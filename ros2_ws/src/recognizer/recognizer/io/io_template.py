@@ -4,12 +4,12 @@ from typing import Any
 
 class IOTemplate(metaclass=ABCMeta):
     @abstractmethod
-    def save(self) -> Any:
+    def save(self, input: Any, key: str) -> Any:
         """Save method."""
         pass
 
     @abstractmethod
-    def load(self) -> Any:
+    def load(self, key: str) -> Any:
         """Load method."""
         pass
 
