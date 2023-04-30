@@ -1,4 +1,5 @@
-FROM nvidia/cuda:11.7.0-cudnn8-devel-ubuntu22.04 as cuda-cudnn-base
+# FROM nvidia/cuda:11.7.0-cudnn8-devel-ubuntu22.04 as cuda-cudnn-base
+FROM ubuntu:22.04 as ubuntu-base
 
 # setting Timezone, Launguage
 
@@ -23,8 +24,8 @@ RUN groupadd -g 1000 nsakairi && useradd -m -s /bin/bash -u ${UID} -g ${GID} -G 
 
 
 # Install ROS2
-FROM cuda-cudnn-base AS ros2-base
-# FROM ubuntu-base AS ros2-base
+#FROM cuda-cudnn-base AS ros2-base
+FROM ubuntu-base AS ros2-base
 
 RUN sudo apt update && \
     sudo apt install -y --no-install-recommends curl gnupg2 lsb-release python3-pip vim wget build-essential ca-certificates

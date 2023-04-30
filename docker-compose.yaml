@@ -4,14 +4,14 @@ services:
   cuda-cudnn-base:
     build: 
       context: .
-      target: cuda-cudnn-base
+      target: ubuntu-base
       # target: ubuntu-base
       args:
         - USER_NAME=${USER_NAME}
         - GROUP_NAME=${GROUP_NAME}
         - UID=${UID}
         - GID=${GID}
-    image: cuda-cudnn-base:latest
+    image: ubuntu-base:latest
     # image: ubuntu-base:latest
   ros2-base:
     build: 
