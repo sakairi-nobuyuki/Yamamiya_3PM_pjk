@@ -14,6 +14,8 @@ numpy = "^1.24.3"
 typer = "^0.7.0"
 black = "^23.3.0"
 isort = "^5.12.0"
+torchvision = "^0.15.1"
+pytest = "^7.3.1"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -24,3 +26,29 @@ boto3 = "^1.26.123"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 99
+exclude = '''
+(
+     \.eggs
+    | \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | venv
+    | \.idea
+    | \.vscode
+    | _build
+    | buck-out
+    | build
+    | dist
+    | migrations
+    | db
+ )
+ '''
+
+[tool.isort]
+profile = "black"
+line_length = 90
+skip_glob = "*/migrations/*.py,*/__init__.py"
