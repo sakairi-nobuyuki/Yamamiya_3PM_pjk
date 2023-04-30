@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from src.io.save_image_s3 import S3ImageIO
+from recognizer.io.save_image_s3 import S3ImageIO
 
 class TestS3ImageIO:
 

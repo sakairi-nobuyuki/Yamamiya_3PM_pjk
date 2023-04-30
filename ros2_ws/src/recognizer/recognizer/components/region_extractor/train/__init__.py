@@ -1,0 +1,4 @@
+# coding: utf-8
+from .thresholding_trainer_template import ThresholdingTrainerTemplate
+from .thresholding_hsv_trainer import ThresholdingTrainer
+from .object_filter_trainer import ObjectFilterTrainer
