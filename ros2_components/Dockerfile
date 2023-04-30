@@ -92,8 +92,8 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
 ARG MINIO_ENDPOINT_URL=${MINIO_ENDPOINT_URL}
 ENV MINIO_ENDPOINT_URL ${MINIO_ENDPOINT_URL}
 
-# Configure robo trade codes
-FROM cuda-ros2-python-base AS yamamiya-pm
+# Configure python dependencies
+FROM cuda-ros2-python-base AS yamamiya-pm-ros2
 
 ARG USER_NAME=${USER_NAME}
 ENV HOME /home/${USER_NAME}
