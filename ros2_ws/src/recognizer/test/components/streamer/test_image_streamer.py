@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from src.components.streamer import ImageStreamerElecom
+from recognizer.components.streamer import ImageStreamerElecom
 import numpy as np
 
 class TestImageStreamerElecom:
