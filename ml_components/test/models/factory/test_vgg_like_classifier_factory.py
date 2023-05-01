@@ -1,9 +1,11 @@
 # coding: utf-8
 
 
-from ml_components.models.factory import ModelFactoryTemplate, VggLikeClassifierFactory
-import torchvision.models as models
 import torch
+import torchvision.models as models
+
+from ml_components.models.factory import ModelFactoryTemplate, VggLikeClassifierFactory
+
 
 class TestVggLikeClassifierFactory:
     factory = VggLikeClassifierFactory()
@@ -28,4 +30,3 @@ class TestVggLikeClassifierFactory:
         forward = self.factory.create_forward()
 
         print(forward(input_tensor))
-
