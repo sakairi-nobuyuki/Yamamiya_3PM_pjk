@@ -1,28 +1,27 @@
 version: "3"
 services:
-  # ubuntu-base:
-  cuda-cudnn-base:
+  torch-base:
     build: 
       context: .
-      target: cuda-cudnn-base
-      # target: ubuntu-base
+      target: torch-base
       args:
         - USER_NAME=${USER_NAME}
         - GROUP_NAME=${GROUP_NAME}
         - UID=${UID}
         - GID=${GID}
-    image: cuda-cudnn-base:latest
-    # image: ubuntu-base:latest
-  cuda-cudnn-python-base:
+    image: torch-base:latest
+    container_name: torch-base
+  torch-python-base:
     build: 
       context: .
-      target: cuda-cudnn-python-base
+      target: torch-python-base
       args:
         - USER_NAME=${USER_NAME}
         - GROUP_NAME=${GROUP_NAME}
         - UID=${UID}
         - GID=${GID}
-    image: cuda-cudnn-python-base:latest
+    image: torch-python-base:latest
+    container_name: torch-python-base
   yamamiya-pm-ml:
     build: 
       context: .
@@ -33,6 +32,7 @@ services:
         - UID=${UID}
         - GID=${GID}
     image: yamamiya-pm-ml:latest
+    container_name: yamamiya-pm-ml
     devices:
         - /dev/video0:/dev/video0
     environment:
@@ -42,7 +42,7 @@ services:
     volumes:
        - /tmp/.X11-unix:/tmp/.X11-unix
        - $HOME/.Xauthority/:/root/.Xauthority
-       - ${WORKSPACE_DIR}:/home/${USER_NAME}/app/
+       - ${WORKSPACE_DIR}:/home/${USER_NAME}/app
     deploy:
       resources:
         reservations:
@@ -51,25 +51,25 @@ services:
               count: 1
               capabilities: [gpu]
     tty: true
-    user: "${UID}:${GID}"
+    # user: "${UID}:${GID}"
     ports:
       - "8000:8888"
       - "8001:8001"
-  minio:
-    image: minio/minio:latest
-    container_name: minio
-    environment:
-      MINIO_ROOT_USER: sigma-chan
-      MINIO_ROOT_PASSWORD: sigma-chan-dayo
-    entrypoint: bash
-    command: -c "/opt/bin/minio server /export --address :9999 --console-address :9001;
-      mkdir -p /data/.minio.sys/buckets;
-      cp -r /policies/* /data/.minio.sys/;
-      /usr/bin/minio server /data"j
-    volumes:
-      - ./data:/export
-      - ./minio/policies:/policies
-      - ./minio/config:/root/.minio
-    ports:
-      - "9000:9999"
-      - "9001:9001"
+#   minio:
+#     image: minio/minio:latest
+#     container_name: minio
+#     environment:
+#       MINIO_ROOT_USER: sigma-chan
+#       MINIO_ROOT_PASSWORD: sigma-chan-dayo
+#     entrypoint: bash
+#     command: -c "/opt/bin/minio server /export --address :9999 --console-address :9001;
+#       mkdir -p /data/.minio.sys/buckets;
+#       cp -r /policies/* /data/.minio.sys/;
+#       /usr/bin/minio server /data"j
+#     volumes:
+#       - ./data:/export
+#       - ./minio/policies:/policies
+#       - ./minio/config:/root/.minio
+#     ports:
+#       - "9000:9999"
+#       - "9001:9001"
