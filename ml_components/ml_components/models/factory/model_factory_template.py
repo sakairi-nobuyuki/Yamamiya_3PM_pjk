@@ -3,6 +3,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any
 
+
 class ModelFactoryTemplate(metaclass=ABCMeta):
     @abstractmethod
     def create_model(self) -> Any:
