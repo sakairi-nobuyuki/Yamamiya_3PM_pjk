@@ -1,6 +1,7 @@
 # coding:
 
 from typing import Callable
+
 import torch.nn as nn
 import torchvision.models as models
 
@@ -15,7 +16,6 @@ class VggLikeClassifierFactory(ModelFactoryTemplate):
             n_classes (int, optional): _description_. Defaults to 2.
         """
         self.n_classes = n_classes
-        
 
     def create_model(self) -> models.vgg.VGG:
         self.model = models.vgg19(pretrained=True)
