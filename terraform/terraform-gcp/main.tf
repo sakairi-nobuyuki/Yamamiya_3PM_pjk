@@ -29,3 +29,21 @@ resource "google_storage_bucket" "static" {
 
   uniform_bucket_level_access = true
 }
+
+resource "google_storage_bucket" "data" {
+  name          = "yamamiya-pm-data"
+  # name          = "${random_id.bucket_prefix.hex}-dataset"
+  location      = "US"
+  storage_class = "COLDLINE"
+
+  uniform_bucket_level_access = true
+}
+
+resource "google_storage_bucket" "config" {
+  name          = "yamamiya-pm-config"
+  # name          = "${random_id.bucket_prefix.hex}-dataset"
+  location      = "US"
+  storage_class = "COLDLINE"
+
+  uniform_bucket_level_access = true
+}
