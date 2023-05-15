@@ -1,8 +1,9 @@
 # coding: utf-8
 
-import pytest
 import cv2
+import pytest
 from example_pkg import ImagePublisher
+
 
 class TestImagePublisher:
     @pytest.fixture
@@ -17,7 +18,7 @@ class TestImagePublisher:
     def test_image_publishing(self, image_publisher: ImagePublisher) -> None:
         """Test that checks if an image is published to a topic correctly."""
         # Load an image from your local machine
-        img = cv2.imread('path/to/image.jpg')
+        img = cv2.imread("path/to/image.jpg")
 
         # Publish the image to a topic
         image_publisher.publish(img)

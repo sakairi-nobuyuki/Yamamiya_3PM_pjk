@@ -1,10 +1,12 @@
 # coding: utf-8
 
-from recognizer.components.streamer import ImageStreamerElecom
 import numpy as np
+from recognizer.components.streamer import ImageStreamerElecom
+
 
 class TestImageStreamerElecom:
     streamer = ImageStreamerElecom()
+
     def test_init(self):
 
         assert isinstance(self.streamer, ImageStreamerElecom)
