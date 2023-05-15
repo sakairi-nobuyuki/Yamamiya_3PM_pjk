@@ -2,4 +2,6 @@
 
 from .conv_region_extractor import ConvolutionRegionExtractor
 from .moving_average_tracker import MovingAverageTracker
-from .thresholding_detector import ThresholdingDetector
+from .detector_template import DetectorTemplate
+from .thresholding_detector_saturate import ThresholdingDetectorSaturate
+

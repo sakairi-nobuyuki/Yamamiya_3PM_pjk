@@ -2,6 +2,7 @@
 from abc import ABCMeta, abstractmethod
 from typing import Any
 
+
 class IOTemplate(metaclass=ABCMeta):
     @abstractmethod
     def save(self, input: Any, key: str) -> Any:
