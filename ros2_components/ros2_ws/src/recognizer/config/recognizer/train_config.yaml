@@ -1,0 +1,17 @@
+threshold:
+  w: 100
+  h: 100
+  aspect_ratio: 1.0
+  w_aspect_ratio: 1.0
+  n_calls: 100
+  preset_space:
+    hsv:
+    - [10, 200]    # threshold
+    - [50, 150]    # lower_green h
+    - [25, 100]    # lower_green s
+    - [25, 100]    # lower_green v
+    - [50, 120]    # higher_green h
+    - [200, 255]   # higher_green s
+    - [200, 255]   # higher_green v
+    saturation:
+    - [10, 200]    # threshold

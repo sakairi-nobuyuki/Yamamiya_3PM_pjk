@@ -52,4 +52,4 @@ exclude = '''
 [tool.isort]
 profile = "black"
 line_length = 90
-skip_glob = ""
+skip_glob = "__init__.py"

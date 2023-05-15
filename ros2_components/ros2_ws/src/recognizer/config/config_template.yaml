@@ -1,0 +1,8 @@
+recognizer:
+  threshold:
+    type: hsv
+    thresholding_value: 20
+    n_calls: 100
+  object_filter:
+    average_standard: 0.1
+    mean: 100

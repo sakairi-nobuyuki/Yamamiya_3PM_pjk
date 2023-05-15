@@ -7,10 +7,10 @@ services:
       target: ubuntu-base
       # target: ubuntu-base
       args:
-        - USER_NAME=${USER_NAME}
-        - GROUP_NAME=${GROUP_NAME}
-        - UID=${UID}
-        - GID=${GID}
+        USER_NAME=${USER_NAME}
+        GROUP_NAME=${GROUP_NAME}
+        UID=${UID}
+        GID=${GID}
     image: ubuntu-base:latest
     # image: ubuntu-base:latest
   ros2-base:
