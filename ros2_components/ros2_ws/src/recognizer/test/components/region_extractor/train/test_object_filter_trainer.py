@@ -6,7 +6,7 @@ from recognizer.io import S3ConfigIO
 
 class TestObjectFilterTrainer:
     def test_run(self, mock_s3_config: S3ConfigIO):
-        
+
         trainer = ObjectFilterTrainer()
 
         trainer.run()
@@ -16,4 +16,3 @@ class TestObjectFilterTrainer:
         loaded_config = mock_s3_config.load("detector/object_filter_config.yaml")
 
         print("loaded config: ", loaded_config)
-        
