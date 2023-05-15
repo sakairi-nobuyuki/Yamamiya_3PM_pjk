@@ -31,7 +31,7 @@ services:
         - GROUP_NAME=${GROUP_NAME}
         - UID=${UID}
         - GID=${GID}
-    image: yamamiya-pm-ml:latest
+    image: nsakairi/yamamiya-pm-ml:latest
     container_name: yamamiya-pm-ml
     devices:
         - /dev/video0:/dev/video0
@@ -52,9 +52,9 @@ services:
               capabilities: [gpu]
     tty: true
     # user: "${UID}:${GID}"
-    ports:
-      - "8000:8888"
-      - "8001:8001"
+#    ports:
+#      - "8000:8888"
+#      - "8001:8001"
 #   minio:
 #     image: minio/minio:latest
 #     container_name: minio
