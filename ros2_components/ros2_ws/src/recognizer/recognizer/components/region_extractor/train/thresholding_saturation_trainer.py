@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from typing import List, Tuple
+from typing import Dict, List, Tuple, Union
 
 import numpy as np
 import scipy
@@ -15,21 +15,18 @@ from skopt.space import Integer, Real
 
 from . import ThresholdingTrainerTemplate
 
-# from ....io import S3ImageIO
-# from .. import ThresholdingDetector
-
 
 app = typer.Typer()
 
 
-class ThresholdingHsvTrainer(ThresholdingTrainerTemplate):
+class ThresholdingSaturationTrainer(ThresholdingTrainerTemplate):
     def __init__(
         self,
         w: int = 100,
         h: int = 100,
         aspect_ratio: float = 1.0,
         w_aspect_ratio: float = 1.0,
-        n_calls: int = 100,
+        n_calls: int = 100, 
         space: List[int] = None,
         s3: S3ImageIO = None,
     ) -> None:
@@ -42,17 +39,10 @@ class ThresholdingHsvTrainer(ThresholdingTrainerTemplate):
                 aspect_ratio: float: average_width / average_length
                 w_aspect_ratio: flaot: weight of aspect ratio against bbox size
         """
-
         ### parameter range
         if space is None:
             self.space = [
                 Integer(10, 200),  # thresholding_value
-                Integer(50, 150),  # lower_green h
-                Integer(25, 100),  # lower_green s
-                Integer(25, 100),  # lower_green v
-                Integer(50, 120),  # upper_green h
-                Integer(200, 255),  # upper_green s
-                Integer(200, 255),  # upper_green v
             ]
         else:
             self.space = space
@@ -81,7 +71,7 @@ class ThresholdingHsvTrainer(ThresholdingTrainerTemplate):
         ]
 
     def run(self) -> scipy.optimize._optimize.OptimizeResult:
-        res = gp_minimize(self.target, self.space, n_calls=self.n_calls, verbose=True)
+        res = gp_minimize(self.target, self.space, n_calls=self.n_calls)
 
         return res
 
@@ -101,16 +91,14 @@ class ThresholdingHsvTrainer(ThresholdingTrainerTemplate):
             - int
             - [0:255]
         """
-        detector = ThresholdingDetector(type="hsv")
+        detector = ThresholdingDetector(type="saturation")
 
         detector.threshold_value = x[0]
-        detector.lower_green = np.array([x[1], x[2], x[3]])
-        detector.upper_green = np.array([x[4], x[5], x[6]])
 
         train_loss = 0
         for file_name in self.file_name_list:
             img = self.s3.load(file_name)
-            contours = detector.detect_green_lsv(img)
+            contours = detector.detect(img)
             train_loss += self.loss(img, contours)
 
         return train_loss
@@ -125,17 +113,11 @@ def main() -> None:
 
     space = [
         Integer(10, 200),  # thresholding_value
-        Integer(50, 150),  # lower_green h
-        Integer(25, 100),  # lower_green s
-        Integer(25, 100),  # lower_green v
-        Integer(50, 120),  # upper_green h
-        Integer(200, 255),  # upper_green s
-        Integer(200, 255),  # upper_green v
     ]
 
     res = gp_minimize(trainer.target, space, n_calls=100)
 
-    return res
+    return res.x
 
 
 if __name__ == "__main__":

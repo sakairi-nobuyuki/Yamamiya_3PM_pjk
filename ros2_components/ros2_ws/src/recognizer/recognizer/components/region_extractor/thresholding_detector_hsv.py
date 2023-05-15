@@ -41,6 +41,8 @@ class ThresholdingDetector:
             self.__detector = self.detect_green_lsv
             self.lower_green = np.array([59, 75, 25])
             self.upper_green = np.array([100, 254, 255])
+            # self.lower_green = np.array([75, 50, 50])
+            # self.upper_green = np.array([110, 255, 255])
         else:
             raise NotImplementedError(f"detector type: {type} is not implemented")
 
