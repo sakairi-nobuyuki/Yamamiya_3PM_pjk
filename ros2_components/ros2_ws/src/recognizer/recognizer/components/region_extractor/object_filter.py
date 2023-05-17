@@ -6,9 +6,10 @@ from typing import Any, List, Tuple, Dict, Union
 import numpy as np
 
 
-class ThresholdingDetector:
+class ObjectFilter:
     def __init__(
         self,
+        filtering_flag: bool = True, 
         config_dict: Dict[str, Union[int, float]] = None
     ):
         """Plum size might be 100px X 100px
@@ -21,7 +22,7 @@ class ThresholdingDetector:
             NotImplementedError: _description_
         """
 
-        if config_dict is None:
+        if config_dict is not None:
             self.sigma = config_dict["sigma"]
             self.mu = config_dict["mu"]
             self.object_filter_threshold = config_dict["threshold"]
@@ -30,20 +31,25 @@ class ThresholdingDetector:
             self.mu = 50
             self.object_filter_threshold = 0.1
 
-    def run(self, bboxes_list: List[List[int]]) -> List[List[int]]:
+        if filtering_flag is True:
+            self.__filter_small_bboxes = lambda x_list: [self.__filter_small_bbox(x) for x in x_list]
+        else:
+            self.__filter_small_bboxes = self.__identity_function_1d
+
+
+    def run(self, bboxes_list: List[Tuple[int]]) -> List[Tuple[int]]:
         """Detect items, and returns its list of bboxes
 
         Args:
             input (np.ndarray): input image
 
         Returns:
-            List[np.ndarray]: bbox coordinate list
+            List[Tuple[int]]: bbox coordinate list
         """
 
-        filtered_bboxes_list = [bbox for bbox in bboxes_list if self.__filter_small_bboxes(bbox)]
+        return self.__filter_small_bboxes(bboxes_list)
 
-        return filtered_bboxes_list
-
+    
 
     def __get_probability(self, x: float) -> float:
         return (
@@ -52,7 +58,7 @@ class ThresholdingDetector:
             * np.exp(-0.5 * ((x - self.mu) / self.sigma) ** 2)
         )
 
-    def __filter_small_bboxes(self, bbox_feature: Tuple[int]) -> bool:
+    def __filter_small_bbox(self, bbox_feature: Tuple[int]) -> bool:
         print("object filter")
         print("  filter input: ", bbox_feature[2], bbox_feature[3])
         prob = self.__get_probability(max(bbox_feature[2], bbox_feature[3]))
@@ -64,3 +70,6 @@ class ThresholdingDetector:
             return True
 
 
+    @classmethod
+    def __identity_function_1d(cls, x: Any) -> Any:
+        return x
