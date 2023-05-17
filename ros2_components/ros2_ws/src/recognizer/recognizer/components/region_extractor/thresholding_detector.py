@@ -118,7 +118,7 @@ class ThresholdingDetector:
 
         return contours
 
-    def __create_cropped_list(
+    def _create_cropped_list(
         self, input: np.ndarray, contours: List[Tuple[int]]
     ) -> List[np.ndarray]:
         """Create a list of cropped image from the contours and input image
