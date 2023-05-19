@@ -1,6 +1,6 @@
 # coding: utf-8
 
-from recognizer.components.region_extractor.train import ThresholdingHsvTrainer
+from recognizer.components.region_extractor.train import ThresholdingSaturationTrainer, ThresholdingTrainerTemplate
 from recognizer.components.region_extractor.train.thresholding_hsv_trainer import main
 
 import scipy
@@ -8,9 +8,9 @@ import pytest
 
 class TestThresholdingTrainer:
     def test_init(self):
-        trainer = ThresholdingHsvTrainer()
+        trainer = ThresholdingSaturationTrainer()
 
-        assert isinstance(trainer, ThresholdingHsvTrainer)
+        assert isinstance(trainer, ThresholdingSaturationTrainer)
 
     def test_target(self):
         """
@@ -18,7 +18,7 @@ class TestThresholdingTrainer:
         self.upper_green = np.array([110, 255, 255])
 
         """
-        trainer = ThresholdingHsvTrainer()
+        trainer = ThresholdingSaturationTrainer()
 
         x = [5, 75, 50, 50, 110, 255, 255]
 
@@ -30,8 +30,8 @@ class TestThresholdingTrainer:
 
     
     def test_run_hsv(self) -> None:
-        
-        trainer = ThresholdingHsvTrainer()
+        trainer = ThresholdingSaturationTrainer()
+        trainer = trainer
         trainer.n_calls = 10
         res = trainer.run()
         print(res, type(res), type(trainer)) 

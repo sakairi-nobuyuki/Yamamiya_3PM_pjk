@@ -3,6 +3,7 @@
 from typing import List, Tuple
 from abc import ABCMeta, abstractmethod
 import numpy as np
+import cv2
 
 class DetectorTemplate(metaclass = ABCMeta):
     """An interface of rule baseddetectors
@@ -38,15 +39,21 @@ class DetectorTemplate(metaclass = ABCMeta):
         """
         coordinate_list = []
         for contour in contours:
-            if -1 in contour:
-                continue
+            print("contour before bounding rect: ", contour)
+            # if -1 in contour:
+            #    print("no contour")
+            #    continue
+            # if len(contour) == 0:
+            #    continue
             ### bounding rect retuns: 
+            
             x, y, w, h = cv2.boundingRect(contour)
             margin = min(w, h)
             x1 = max(x - margin, 0)
             y1 = max(y - margin, 0)
             x2 = min(x + w + margin, input.shape[1])
             y2 = min(y + h + margin, input.shape[0])
-            coordinate_list.append((x1, y1, x2 - x1, y2 - y1))
 
+            coordinate_list.append((x1, y1, x2 - x1, y2 - y1))
+        print("bboxes: ", coordinate_list)
         return coordinate_list

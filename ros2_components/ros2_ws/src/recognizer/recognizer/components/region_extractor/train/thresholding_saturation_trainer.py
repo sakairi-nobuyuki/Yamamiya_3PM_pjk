@@ -8,7 +8,7 @@ import scipy
 np.int = int
 import cv2
 import typer
-from recognizer.components.region_extractor import ThresholdingDetector
+from recognizer.components.region_extractor import ThresholdingDetectorSaturate
 from recognizer.io import S3ImageIO
 from skopt import gp_minimize
 from skopt.space import Integer, Real
@@ -91,7 +91,7 @@ class ThresholdingSaturationTrainer(ThresholdingTrainerTemplate):
             - int
             - [0:255]
         """
-        detector = ThresholdingDetector(type="saturation")
+        detector = ThresholdingDetectorSaturate()
 
         detector.threshold_value = x[0]
 
@@ -106,10 +106,9 @@ class ThresholdingSaturationTrainer(ThresholdingTrainerTemplate):
     def loss(self, img: np.ndarray, contours: List[Tuple[int]]) -> float:
         return super().loss(img, contours)
 
-
 @app.command()
 def main() -> None:
-    trainer = ThresholdingTrainer()
+    trainer = ThresholdingSaturationTrainer()
 
     space = [
         Integer(10, 200),  # thresholding_value

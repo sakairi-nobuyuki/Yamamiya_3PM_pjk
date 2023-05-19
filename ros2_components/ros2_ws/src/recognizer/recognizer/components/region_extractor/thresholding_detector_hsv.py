@@ -39,10 +39,10 @@ class ThresholdingDetectorHsv(DetectorTemplate):
             self.__lower_green = np.array([59, 75, 25])
         
     @property
-    def uppser_green(self) -> np.ndarray:
+    def upper_green(self) -> np.ndarray:
         return self.__upper_green
 
-    @lower_green.setter
+    @upper_green.setter
     def upper_green(self, upper_green: Union[np.ndarray, None]) -> None:
         if upper_green is not None:
             self.__upper_green = upper_green
@@ -58,7 +58,7 @@ class ThresholdingDetectorHsv(DetectorTemplate):
         if threshold_value is not None:
             self.__threshold_value = threshold_value
         else:
-            self.__threshold_value = 20
+            self.__threshold_value = 100
 
 
 
@@ -91,6 +91,7 @@ class ThresholdingDetectorHsv(DetectorTemplate):
         self.gray = hsv
         mask = cv2.inRange(hsv, self.lower_green, self.upper_green)
         contours = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+        print("contours: ", contours)
 
         return contours
 
