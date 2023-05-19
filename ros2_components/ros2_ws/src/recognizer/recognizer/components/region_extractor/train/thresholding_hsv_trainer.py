@@ -8,7 +8,7 @@ import scipy
 np.int = int
 import cv2
 import typer
-from recognizer.components.region_extractor import ThresholdingDetector
+from recognizer.components.region_extractor import ThresholdingDetectorHsv
 from recognizer.io import S3ImageIO
 from skopt import gp_minimize
 from skopt.space import Integer, Real
@@ -101,7 +101,7 @@ class ThresholdingHsvTrainer(ThresholdingTrainerTemplate):
             - int
             - [0:255]
         """
-        detector = ThresholdingDetector(type="hsv")
+        detector = ThresholdingDetectorHsv()
 
         detector.threshold_value = x[0]
         detector.lower_green = np.array([x[1], x[2], x[3]])
@@ -110,7 +110,7 @@ class ThresholdingHsvTrainer(ThresholdingTrainerTemplate):
         train_loss = 0
         for file_name in self.file_name_list:
             img = self.s3.load(file_name)
-            contours = detector.detect_green_lsv(img)
+            contours = detector.detect(img)
             train_loss += self.loss(img, contours)
 
         return train_loss
@@ -121,7 +121,7 @@ class ThresholdingHsvTrainer(ThresholdingTrainerTemplate):
 
 @app.command()
 def main() -> None:
-    trainer = ThresholdingTrainer()
+    trainer = ThresholdingHsvTrainer()
 
     space = [
         Integer(10, 200),  # thresholding_value

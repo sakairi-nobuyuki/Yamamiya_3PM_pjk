@@ -17,6 +17,15 @@ class ThresholdingTrainerTemplate(metaclass=ABCMeta):
         pass
 
     def loss(self, img: np.ndarray, contours: List[Tuple[int]]) -> float:
+        """Contours are not contours, but bounding boxes
+
+        Args:
+            img (np.ndarray): _description_
+            contours (List[Tuple[int]]): _description_
+
+        Returns:
+            float: _description_
+        """
 
         loss_value = 0
         n_contour = 0
@@ -26,7 +35,8 @@ class ThresholdingTrainerTemplate(metaclass=ABCMeta):
             #if len(contour) != 1:
             #    return 1.0e+06
             print(contour)
-            x, y, w, h = cv2.boundingRect(contour)
+            # x, y, w, h = cv2.boundingRect(contour)
+            x, y, w, h = contour
             print(f"w: {w}, h: {h}")
             loss_value += (
                 self.w_aspect_ratio

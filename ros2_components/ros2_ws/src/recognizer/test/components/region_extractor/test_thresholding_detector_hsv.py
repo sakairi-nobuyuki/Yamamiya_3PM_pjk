@@ -25,8 +25,9 @@ class TestThresholdingDetectorHsv:
 
         for i_target, img_file_name in enumerate(img_file_name_list):
             target = mock_s3_dataset.load(img_file_name)
-            print(type(target))
+            print("target: ", type(target), detector.lower_green, detector.upper_green, detector.threshold_value)
             cropped_img_list = detector.detect(target)
 
             assert isinstance(cropped_img_list, list)
+            print("cropped bboxes: ", cropped_img_list)
 
