@@ -6,7 +6,7 @@ import numpy as np
 from skopt import gp_minimize
 from skopt.space import Integer, Real
 
-from ...components.region_extractor.train import ObjectFilterTrainer, ThresholdingTrainer
+from ...components.region_extractor.train import ObjectFilterTrainer, ThresholdingHsvTrainer, ThresholdingSaturationTrainer
 from ...io import S3ConfigIO, S3ImageIO
 
 
@@ -22,20 +22,18 @@ class RegionExtractorTrainPipeline:
             raise TypeError(f"config_s3 should be an instance of S3ConfigIO: {type(config_s3)}")
         self.train_config = train_config
         
-        self.thresholding_hsv_trainer = ThresholdingTrainer(
-            **self.train_config["threshold"], s3=dataset_s3, n_calls = self.train_config["threshold"]["n_calls"]
-        )
-        self.thresholding_saturation_trainer = ThresholdingTrainer(
-            **self.train_config["threshold"], s3=dataset_s3, n_calls = self.train_config["threshold"]["n_calls"] 
-        )
-        
-        # self.object_filter_trainer = ObjectFilterTrainer(image_s3=dataset_s3, config_s3=config_s3)
+        self.thresholding_hsv_trainer = ThresholdingHsvTrainer()
+        self.thresholding_saturation_trainer = ThresholdingSaturationTrainer()
         self.object_filter_trainer = ObjectFilterTrainer(image_s3=dataset_s3)
+        self.s3_config = config_s3
+        self.trained_thresholding_parameter_file = "detector/thresholding.yaml"
 
     def run(self) -> Dict[str, Any]:
         ### train thresholding
-        
+        res_threshold = self.train_thresholding()
+
         ## train object filter
+
 
         ## create a config dict and save
         pass
@@ -48,11 +46,11 @@ class RegionExtractorTrainPipeline:
         # train
         pass
 
-    def __train_thresholding(self)  -> Dict[str, Any]:
+    def train_thresholding(self)  -> Dict[str, Any]:
         ## train thresholding things
         print("training thresholoing")
         res_thresholding_hsv = self.thresholding_hsv_trainer.run()
-        res_thresholding_saturation = self.threasholding_saturation_trainer.run()
+        res_thresholding_saturation = self.thresholding_saturation_trainer.run()
         
         min_loss_thresholding_hsv = np.min(res_thresholding_hsv.func_value)
         min_loss_thresholding_saturation = np.min(res_thresholding_saturation.func_value)
