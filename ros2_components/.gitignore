@@ -144,3 +144,5 @@ database/data
 ### ROS
 install/
 log/
+cinfig/
+dataset/

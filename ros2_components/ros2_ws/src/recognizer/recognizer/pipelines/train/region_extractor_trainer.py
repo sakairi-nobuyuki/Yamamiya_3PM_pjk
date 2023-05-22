@@ -7,6 +7,7 @@ from skopt import gp_minimize
 from skopt.space import Integer, Real
 
 from ...components.region_extractor.train import ObjectFilterTrainer, ThresholdingHsvTrainer, ThresholdingSaturationTrainer
+from ...components.region_extractor import DetectorFactory
 from ...io import S3ConfigIO, S3ImageIO
 
 
@@ -26,14 +27,16 @@ class RegionExtractorTrainPipeline:
         self.thresholding_saturation_trainer = ThresholdingSaturationTrainer()
         self.object_filter_trainer = ObjectFilterTrainer(image_s3=dataset_s3)
         self.s3_config = config_s3
-        self.trained_thresholding_parameter_file = "detector/thresholding.yaml"
+        self.trained_thresholding_parameter_file = "detector/thresholding_config.yaml"
 
     def run(self) -> Dict[str, Any]:
         ### train thresholding
         res_threshold = self.train_thresholding()
 
         ## train object filter
-
+        ### create dataset for object_filter training
+        detector = DetectorFactory(**res_threshold)
+        
 
         ## create a config dict and save
         pass
@@ -57,11 +60,11 @@ class RegionExtractorTrainPipeline:
         
         if min_loss_thresholding_hsv > min_loss_thresholding_saturation:
             res_list = res_thresholding_hsv.x_iters[np.argmin(res_thresholding_hsv.func_vals)]
-            res_dict = dict(type="hsv", thresholding_value=res_list[0], lower_green=[res_list[1], res_list[2], res_list[3]], upper_green=[res_list[4], res_list[5], res_list[6]], n_calls = 100)
+            res_dict = dict(type="hsv", thresholding_value=res_list[0], lower_green=[res_list[1], res_list[2], res_list[3]], upper_green=[res_list[4], res_list[5], res_list[6]])
         else:
             res_list = res_thresholding_saturation.x_iters[np.argmin(res_thresholding_saturation.func_vals)]
-            res_dict = dict(type="saturation", thresholding_value=res_list[0], n_calls = 100)
+            res_dict = dict(type="saturation", thresholding_value=res_list[0])
 
-        print("res: ", res_dict)
+        print("train threshold res: ", res_dict)
 
         return res_dict

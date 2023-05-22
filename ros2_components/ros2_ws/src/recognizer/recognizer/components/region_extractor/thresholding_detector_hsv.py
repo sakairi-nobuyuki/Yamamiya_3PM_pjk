@@ -10,8 +10,8 @@ class ThresholdingDetectorHsv(DetectorTemplate):
     def __init__(
         self,
         threshold_value: int = None,
-        lower_green: np.ndarray = None, 
-        upper_green: np.ndarray = None
+        lower_green: List[int] = None, 
+        upper_green: List[int] = None
     ):
         """Plum size might be 100px X 100px
 
@@ -23,8 +23,8 @@ class ThresholdingDetectorHsv(DetectorTemplate):
             NotImplementedError: _description_
         """
         self.threshold_value = threshold_value
-        self.lower_green = lower_green
-        self.upper_green = upper_green
+        self.lower_green = np.array(lower_green)
+        self.upper_green = np.array(upper_green)
         self.__detector = self.detect_green_lsv
 
     @property
