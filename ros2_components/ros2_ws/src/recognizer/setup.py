@@ -8,8 +8,11 @@ setup(
     packages=[
         package_name,
         "recognizer/components/streamer",
+        "recognizer/components/region_extractor",
+        "recognizer/components/region_extractor/train",
         "recognizer/io",
         "recognizer/pipelines/data_collection",
+        "recognizer/pipelines/train",
     ],
     data_files=[
         ("share/ament_index/resource_index/packages", ["resource/" + package_name]),
@@ -23,6 +26,7 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": ["image_streaming_node = recognizer.image_streaming_node:main"],
+        "console_scripts": ["image_streaming_node = recognizer.image_streaming_node:main", 
+                            "thresholding_train_node = recognizer.thresholding_train_node:main"],
     },
 )
