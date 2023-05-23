@@ -7,8 +7,8 @@ import numpy as np
 
 from . import DetectorTemplate
 
-class ThresholdingDetectorSaturate(DetectorTemplate):
 
+class ThresholdingDetectorSaturate(DetectorTemplate):
     def __init__(
         self,
         threshold_value: int = None,
@@ -51,12 +51,12 @@ class ThresholdingDetectorSaturate(DetectorTemplate):
 
         # bboxes_list = self._create_object_coordinate_list(input, contours)
 
-#        print("bbox list to return from ThresholdSaturate: ", bboxes_list)
+        #        print("bbox list to return from ThresholdSaturate: ", bboxes_list)
 
         return bboxes_list
 
     def detect_saturated(self, input: np.ndarray) -> List[Tuple[int]]:
-#        print("detect saturated")
+        #        print("detect saturated")
         input = cv2.medianBlur(input, 5)
         hsv = cv2.cvtColor(input, cv2.COLOR_BGR2HSV_FULL)
         target = cv2.split(hsv)[1]
@@ -65,12 +65,12 @@ class ThresholdingDetectorSaturate(DetectorTemplate):
             target, self.threshold_value, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
         )[1]
         contours = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
-#        print("contours: ", contours, type(contours))
-#        contours = cv2.findContours(target, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
-#        contours = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
-        
+        #        print("contours: ", contours, type(contours))
+        #        contours = cv2.findContours(target, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
+        #        contours = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
+
         bbox_list = self._create_object_coordinate_list(input, contours)
-#        print("bbox list after detect_saturated: ", bbox_list)
+        #        print("bbox list after detect_saturated: ", bbox_list)
 
         return bbox_list
 
@@ -88,17 +88,17 @@ class ThresholdingDetectorSaturate(DetectorTemplate):
         """
         # coordinate_list = super()._create_object_coordinate_list(input, contours)
         # print("coordinate list: ", coordinate_list, type(coordinate_list))
-#        print("start _create_object_coordinate_list")
+        #        print("start _create_object_coordinate_list")
         coordinate_list = []
         for contour in contours:
-#            print("contour before bounding rect: ", contour)
+            #            print("contour before bounding rect: ", contour)
             # if -1 in contour:
             #    print("no contour")
             #    continue
             # if len(contour) == 0:
             #    continue
-            ### bounding rect retuns: 
-            
+            ### bounding rect retuns:
+
             x, y, w, h = cv2.boundingRect(contour)
             margin = min(w, h)
             x1 = max(x - margin, 0)
@@ -110,4 +110,3 @@ class ThresholdingDetectorSaturate(DetectorTemplate):
         # print("bboxes: ", coordinate_list)
 
         return coordinate_list
-

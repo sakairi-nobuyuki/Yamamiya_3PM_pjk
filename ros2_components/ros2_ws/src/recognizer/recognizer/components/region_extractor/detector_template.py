@@ -1,17 +1,19 @@
 # coding: utf-8
 
-from typing import List, Tuple
 from abc import ABCMeta, abstractmethod
-import numpy as np
-import cv2
+from typing import List, Tuple
 
-class DetectorTemplate(metaclass = ABCMeta):
+import cv2
+import numpy as np
+
+
+class DetectorTemplate(metaclass=ABCMeta):
     """An interface of rule baseddetectors
 
     Args:
         metaclass (_type_, optional): Inhering abstract class. Defaults to ABCMeta.
     """
-    
+
     @abstractmethod
     def detect(self, input: np.ndarray) -> List[np.ndarray]:
         """Detect something and return a list of contours
@@ -20,10 +22,9 @@ class DetectorTemplate(metaclass = ABCMeta):
             input (np.ndarray): Input image of OpenCV
 
         Returns:
-            List[np.ndarray]: A list of OpenCV contours of detected things. 
+            List[np.ndarray]: A list of OpenCV contours of detected things.
         """
         pass
-
 
     def _create_object_coordinate_list(
         self, input: np.ndarray, contours: List[Tuple[int]]
@@ -45,8 +46,8 @@ class DetectorTemplate(metaclass = ABCMeta):
             #    continue
             # if len(contour) == 0:
             #    continue
-            ### bounding rect retuns: 
-            
+            ### bounding rect retuns:
+
             x, y, w, h = cv2.boundingRect(contour)
             margin = min(w, h)
             x1 = max(x - margin, 0)

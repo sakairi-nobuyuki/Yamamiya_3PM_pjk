@@ -8,7 +8,6 @@ from recognizer.io import S3ConfigIO, S3ImageIO
 class TestThresholdingDetectorSaturate:
     def test_init(self) -> None:
         detector = ThresholdingDetectorSaturate()
-        
 
         assert isinstance(detector, ThresholdingDetectorSaturate)
 

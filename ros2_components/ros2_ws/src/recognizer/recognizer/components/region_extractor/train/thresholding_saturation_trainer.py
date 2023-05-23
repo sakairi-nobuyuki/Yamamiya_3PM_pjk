@@ -15,7 +15,6 @@ from skopt.space import Integer, Real
 
 from . import ThresholdingTrainerTemplate
 
-
 app = typer.Typer()
 
 
@@ -26,7 +25,7 @@ class ThresholdingSaturationTrainer(ThresholdingTrainerTemplate):
         h: int = 100,
         aspect_ratio: float = 1.0,
         w_aspect_ratio: float = 1.0,
-        n_calls: int = 100, 
+        n_calls: int = 100,
         space: List[int] = None,
         s3: S3ImageIO = None,
     ) -> None:
@@ -105,6 +104,7 @@ class ThresholdingSaturationTrainer(ThresholdingTrainerTemplate):
 
     def loss(self, img: np.ndarray, contours: List[Tuple[int]]) -> float:
         return super().loss(img, contours)
+
 
 @app.command()
 def main() -> None:

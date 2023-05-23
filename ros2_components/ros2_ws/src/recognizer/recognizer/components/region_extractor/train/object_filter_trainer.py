@@ -4,7 +4,9 @@ from typing import Dict
 
 import cv2
 import numpy as np
-from recognizer.components.region_extractor import ThresholdingDetectorHsv as ThresholdingDetector
+from recognizer.components.region_extractor import (
+    ThresholdingDetectorHsv as ThresholdingDetector,
+)
 from recognizer.io import S3ImageIO
 
 
