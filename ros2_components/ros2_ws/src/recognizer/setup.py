@@ -26,7 +26,9 @@ setup(
     license="TODO: License declaration",
     tests_require=["pytest"],
     entry_points={
-        "console_scripts": ["image_streaming_node = recognizer.image_streaming_node:main", 
-                            "thresholding_train_node = recognizer.thresholding_train_node:main"],
+        "console_scripts": [
+            "image_streaming_node = recognizer.image_streaming_node:main",
+            "thresholding_train_node = recognizer.thresholding_train_node:main",
+        ],
     },
 )

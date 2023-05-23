@@ -1,15 +1,22 @@
 # coding: utf-8
 
-from typing import Dict, Any
-import pytest
-import numpy as np
+from typing import Any, Dict
 
-from recognizer.components.region_extractor import DetectorFactory, FactoryTemplate
-from recognizer.components.region_extractor import ThresholdingDetectorHsv, ThresholdingDetectorSaturate, DetectorTemplate
+import numpy as np
+import pytest
+from recognizer.components.region_extractor import (
+    DetectorFactory,
+    DetectorTemplate,
+    FactoryTemplate,
+    ThresholdingDetectorHsv,
+    ThresholdingDetectorSaturate,
+)
+
 
 @pytest.fixture
 def mock_config_dict() -> Dict[str, Any]:
     return dict(type="hsv", threshold_value=20)
+
 
 class TestDetectorFactory:
     def test_init(self, mock_config_dict: Dict[str, Any]) -> None:

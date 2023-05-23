@@ -1,10 +1,10 @@
 # coding: utf-8
 
+import pytest
+import scipy
 from recognizer.components.region_extractor.train import ThresholdingHsvTrainer
 from recognizer.components.region_extractor.train.thresholding_hsv_trainer import main
 
-import scipy
-import pytest
 
 class TestThresholdingTrainer:
     def test_init(self):
@@ -28,12 +28,11 @@ class TestThresholdingTrainer:
 
         assert isinstance(loss, float)
 
-    
     def test_run_hsv(self) -> None:
-        
+
         trainer = ThresholdingHsvTrainer()
         trainer.n_calls = 10
         res = trainer.run()
-        print(res, type(res), type(trainer)) 
+        print(res, type(res), type(trainer))
 
         assert isinstance(res, scipy.optimize._optimize.OptimizeResult)

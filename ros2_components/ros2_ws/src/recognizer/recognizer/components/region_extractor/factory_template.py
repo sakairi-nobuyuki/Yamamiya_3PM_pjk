@@ -1,9 +1,10 @@
 # coding: utf-8
 
-from typing import Dict, Any
 from abc import ABCMeta, abstractmethod
+from typing import Any, Dict
 
-class FactoryTemplate(metaclass = ABCMeta):
+
+class FactoryTemplate(metaclass=ABCMeta):
     @abstractmethod
     def create(self) -> None:
         pass

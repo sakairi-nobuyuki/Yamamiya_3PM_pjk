@@ -1,17 +1,19 @@
 # coding: utf-8
 
 from typing import List, Tuple, Union
+
 import cv2
 import numpy as np
 
 from . import DetectorTemplate
 
+
 class ThresholdingDetectorHsv(DetectorTemplate):
     def __init__(
         self,
         threshold_value: int = None,
-        lower_green: List[int] = None, 
-        upper_green: List[int] = None
+        lower_green: List[int] = None,
+        upper_green: List[int] = None,
     ):
         """Plum size might be 100px X 100px
 
@@ -37,7 +39,7 @@ class ThresholdingDetectorHsv(DetectorTemplate):
             self.__lower_green = lower_green
         else:
             self.__lower_green = np.array([59, 75, 25])
-        
+
     @property
     def upper_green(self) -> np.ndarray:
         return self.__upper_green
@@ -59,8 +61,6 @@ class ThresholdingDetectorHsv(DetectorTemplate):
             self.__threshold_value = threshold_value
         else:
             self.__threshold_value = 100
-
-
 
     def detect(self, input: np.ndarray) -> List[Tuple[int]]:
         """Detect items, and returns its list of bboxes
@@ -110,4 +110,3 @@ class ThresholdingDetectorHsv(DetectorTemplate):
         coordinate_list = super()._create_object_coordinate_list(input, contours)
 
         return coordinate_list
-

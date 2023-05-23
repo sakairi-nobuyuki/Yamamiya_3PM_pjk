@@ -1,6 +1,11 @@
 # coding: utf-8
 
-from recognizer.components.region_extractor import DetectorContext, DetectorTemplate, ThresholdingDetectorHsv, ThresholdingDetectorSaturate
+from recognizer.components.region_extractor import (
+    DetectorContext,
+    DetectorTemplate,
+    ThresholdingDetectorHsv,
+    ThresholdingDetectorSaturate,
+)
 
 
 class TestDetectorContext:
@@ -8,5 +13,3 @@ class TestDetectorContext:
         detector = DetectorContext(ThresholdingDetectorHsv())
 
         assert isinstance(detector, DetectorContext)
-
-

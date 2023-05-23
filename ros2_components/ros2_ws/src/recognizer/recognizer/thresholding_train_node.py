@@ -3,8 +3,9 @@
 import rclpy
 from rclpy.node import Node
 
-from .pipelines.train.thresholding_trainer import ThresholdingTrainer
 from .io import S3ConfigIO, S3ImageIO
+from .pipelines.train.thresholding_trainer import ThresholdingTrainer
+
 
 class ThresholdingTrainNode(Node):
     def __init__(self) -> None:
@@ -32,22 +33,23 @@ class ThresholdingTrainNode(Node):
 
     def spin_callback(self) -> None:
         self.get_logger().info(f"{self.node_name} Start train")
-        
+
         self.trainer.run()
 
 
 def main(args=None) -> None:
 
     rclpy.init(args=args)
-#     node = ThresholdingTrainNode()
-#     executor = rclpy.executors.SingleThreadedExecutor()
-#     executor.add_node(node.spin_callback())
-#     executor.spin_once()
+    #     node = ThresholdingTrainNode()
+    #     executor = rclpy.executors.SingleThreadedExecutor()
+    #     executor.add_node(node.spin_callback())
+    #     executor.spin_once()
     node = rclpy.create_node("thresholding_train_node")
     trainer = ThresholdingTrainNode()
     trainer.spin_callback()
     node.destroy_node()
     rclpy.shutdown()
+
 
 if __name__ == "__main__":
     main()

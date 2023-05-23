@@ -11,7 +11,6 @@ class TestThresholdingDetectorHsv:
 
         assert isinstance(detector, ThresholdingDetectorHsv)
 
-
     def test_detect(self, mock_s3_dataset: S3ImageIO, mock_s3: S3ImageIO) -> None:
         detector = ThresholdingDetectorHsv()
 
@@ -25,9 +24,14 @@ class TestThresholdingDetectorHsv:
 
         for i_target, img_file_name in enumerate(img_file_name_list):
             target = mock_s3_dataset.load(img_file_name)
-            print("target: ", type(target), detector.lower_green, detector.upper_green, detector.threshold_value)
+            print(
+                "target: ",
+                type(target),
+                detector.lower_green,
+                detector.upper_green,
+                detector.threshold_value,
+            )
             cropped_img_list = detector.detect(target)
 
             assert isinstance(cropped_img_list, list)
             print("cropped bboxes: ", cropped_img_list)
-

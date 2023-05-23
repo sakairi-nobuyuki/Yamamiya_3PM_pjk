@@ -77,8 +77,8 @@ class ThresholdingDetector:
         img_bin = cv2.threshold(
             target, self.threshold_value, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
         )[1]
-#        contours = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
-#        contours = cv2.findContours(target, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
+        #        contours = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+        #        contours = cv2.findContours(target, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
         contours = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
 
         return contours

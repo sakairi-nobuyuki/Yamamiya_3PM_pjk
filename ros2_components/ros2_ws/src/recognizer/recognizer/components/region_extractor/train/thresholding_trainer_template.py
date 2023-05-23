@@ -30,9 +30,9 @@ class ThresholdingTrainerTemplate(metaclass=ABCMeta):
         loss_value = 0
         n_contour = 0
         if len(contours) == 0:
-            return 1.0e+06
+            return 1.0e06
         for i_contour, contour in enumerate(contours):
-            #if len(contour) != 1:
+            # if len(contour) != 1:
             #    return 1.0e+06
             print(contour)
             # x, y, w, h = cv2.boundingRect(contour)
