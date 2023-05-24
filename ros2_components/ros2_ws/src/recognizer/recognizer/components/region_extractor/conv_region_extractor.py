@@ -3,6 +3,7 @@
 import cv2
 import numpy as np
 
+
 class ConvolutionRegionExtractor:
     def __init__(self, input_size: int, kernel_size: int):
 
@@ -23,7 +24,7 @@ class ConvolutionRegionExtractor:
 
         Args:
             ref (np.ndarray): Reference image
-            target (np.ndarray): Traget image to extract something 
+            target (np.ndarray): Traget image to extract something
         """
         ref = self.__conv(ref)
         target = self.__conv(target)
@@ -40,7 +41,7 @@ class ConvolutionRegionExtractor:
         Returns:
             np.ndarray: Filetered image
         """
-#        input = cv2.cvtColor(input, cv2.COLOR_BGR2GRAY)
+        #        input = cv2.cvtColor(input, cv2.COLOR_BGR2GRAY)
         return cv2.filter2D(input, -1, self.kernel)
 
     def __create_uniform_kernel(self, kernel_size: int) -> np.ndarray:
@@ -50,6 +51,6 @@ class ConvolutionRegionExtractor:
             kernel_size (int): kernel size
 
         Returns:
-            np.ndarray: kernel 
+            np.ndarray: kernel
         """
         return np.ones((kernel_size, kernel_size))

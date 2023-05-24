@@ -1,4 +1,4 @@
-SRCS = ros_ws .
+SRCS = test ml_components . 
 POETRY_PREFIX = poetry run
 CONTAINER_NAME = yamamiya-pm-ml
 REGISTORY_NAME = nsakairi
@@ -11,6 +11,7 @@ format:
 build-app:
 	docker-compose build --no-cache 
 push-image:
+	docker tag $(CONTAINER_NAME):$(DEFAULT_TAG) $(REGISTORY_NAME)/$(CONTAINER_NAME):$(DEFAULT_TAG)
 	docker push $(REGISTORY_NAME)/$(CONTAINER_NAME):$(DEFAULT_TAG)
 # sha256:d805e62840d43d7617960ef70d22b6ef2a9dbb714d744e850da9563d2c8aed31
 

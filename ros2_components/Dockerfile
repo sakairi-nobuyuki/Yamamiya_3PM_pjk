@@ -99,13 +99,16 @@ ARG USER_NAME=${USER_NAME}
 ENV HOME /home/${USER_NAME}
 
 COPY ./pyproject.toml ${HOME}/app 
-COPY ./poetry.lock ${HOME}/app
+# COPY ./poetry.lock ${HOME}/app
 
 ### install python dependencies
 RUN poetry config virtualenvs.create false && \
     poetry config installer.parallel false && \
-    poetry export -f requirements.txt --output requirements.txt --without-hashes && \
-    pip3 install -r requirements.txt --user --no-deps
+#    poetry install
+# RUN poetry install
+   poetry export -f requirements.txt --output requirements.txt --without-hashes && \
+   pip3 install -r requirements.txt --user --no-deps
+
 
 
 # configure the ros environment
