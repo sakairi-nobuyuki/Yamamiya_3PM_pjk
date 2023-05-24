@@ -29,6 +29,7 @@ setup(
         "console_scripts": [
             "image_streaming_node = recognizer.image_streaming_node:main",
             "thresholding_train_node = recognizer.thresholding_train_node:main",
+            "object_filter_train_node = recognizer.object_filter_train_node:main",
         ],
     },
 )
