@@ -1,13 +1,21 @@
 # coding: utf-8
 
-from typing import List, Tuple, Any
-import numpy as np
+from typing import Any, List, Tuple
+
 import cv2
+import numpy as np
 
 from ...io import S3ConfigIO
 
+
 class ThresholdingDetector:
-    def __init__(self, config_s3: S3ConfigIO = None, type: str = "hsv", threshold_value: int = None, object_filter_threshold: float = 0.01):
+    def __init__(
+        self,
+        config_s3: S3ConfigIO = None,
+        type: str = "hsv",
+        threshold_value: int = None,
+        object_filter_threshold: float = 0.01,
+    ):
         """Plum size might be 100px X 100px
 
         Args:
@@ -32,9 +40,7 @@ class ThresholdingDetector:
         elif type is None or type == "hsv":
             self.__detector = self.detect_green_lsv
             self.lower_green = np.array([59, 75, 25])
-            self.upper_green = np.array([100, 254, 255])    
-            # self.lower_green = np.array([75, 50, 50])
-            # self.upper_green = np.array([110, 255, 255])    
+            self.upper_green = np.array([100, 254, 255])
         else:
             raise NotImplementedError(f"detector type: {type} is not implemented")
 
@@ -44,13 +50,21 @@ class ThresholdingDetector:
         else:
             self.__filter = self.__identity_function_1d
         self.get_contours = self.__detector
-                
+
     def detect(self, input: np.ndarray) -> List[np.ndarray]:
+        """Detect items, and returns its list of bboxes
+
+        Args:
+            input (np.ndarray): input image
+
+        Returns:
+            List[np.ndarray]: bbox coordinate list
+        """
 
         contours = self.__detector(input)
 
         img_list = self.__create_cropped_list(input, contours)
-        print("contour: ", type(contours))
+        # print("contour: ", type(contours))
 
         return img_list
 
@@ -60,8 +74,12 @@ class ThresholdingDetector:
         hsv = cv2.cvtColor(input, cv2.COLOR_BGR2HSV_FULL)
         target = cv2.split(hsv)[1]
         self.gray = target
-        img_bin = cv2.threshold(target, self.threshold_value, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
-        contours = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+        img_bin = cv2.threshold(
+            target, self.threshold_value, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
+        )[1]
+        #        contours = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+        #        contours = cv2.findContours(target, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
+        contours = cv2.findContours(img_bin, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[1]
 
         return contours
 
@@ -96,14 +114,13 @@ class ThresholdingDetector:
         self.gray = img
         img = cv2.threshold(img, self.threshold_value, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
-        contours = cv2.findContours(img,
-                        cv2.RETR_EXTERNAL,
-                        cv2.CHAIN_APPROX_SIMPLE)[0]
+        contours = cv2.findContours(img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
 
         return contours
-        
 
-    def __create_cropped_list(self, input: np.ndarray, contours: List[Tuple[int]]) -> List[np.ndarray]:
+    def _create_cropped_list(
+        self, input: np.ndarray, contours: List[Tuple[int]]
+    ) -> List[np.ndarray]:
         """Create a list of cropped image from the contours and input image
 
         Args:
@@ -115,22 +132,27 @@ class ThresholdingDetector:
         """
         img_list = []
         for contour in contours:
+            if -1 in contour:
+                continue
             x, y, w, h = cv2.boundingRect(contour)
             if self.__filter((x, y, w, h)):
-            # if w > 10 or h > 10:
+                # if w > 10 or h > 10:
                 # img_list.append(cv2.rectangle(input, (x, y), (x+w, y+h), (0, 0, 255), 2))
                 margin = min(w, h)
                 x1 = max(x - margin, 0)
                 y1 = max(y - margin, 0)
                 x2 = min(x + w + margin, input.shape[1])
                 y2 = min(y + h + margin, input.shape[0])
-                img_list.append(input[y1: y2, x1: x2])
+                img_list.append(input[y1:y2, x1:x2])
 
         return img_list
 
-
     def __get_probability(self, x: float) -> float:
-        return 1/(self.sigma * np.sqrt(2 * np.pi)) * np.exp(-0.5 * ((x - self.mu)/self.sigma)**2)
+        return (
+            1
+            / (self.sigma * np.sqrt(2 * np.pi))
+            * np.exp(-0.5 * ((x - self.mu) / self.sigma) ** 2)
+        )
 
     def __filter_small_bboxes(self, bbox_feature: Tuple[int]) -> bool:
         print("object filter")

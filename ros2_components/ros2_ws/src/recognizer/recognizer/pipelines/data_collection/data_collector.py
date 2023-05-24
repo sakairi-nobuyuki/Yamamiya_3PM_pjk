@@ -2,9 +2,11 @@
 
 
 from datetime import datetime
+
 import numpy as np
+
 from ...components.streamer import ImageStreamerElecom, StreamerTemplate
-from ...io import S3ImageIO, IOTemplate
+from ...io import IOTemplate, S3ImageIO
 
 
 class DataCollector:
@@ -15,9 +17,9 @@ class DataCollector:
             raise TypeError(f"{type(io)} is not implemented.")
         self.io = io
         self.streamer = streamer
-        
+
     def run(self) -> str:
-        """Retrieve an image from a camera and save the image to a bucket with filename 
+        """Retrieve an image from a camera and save the image to a bucket with filename
         is datetime.
 
         Returns:
@@ -48,19 +50,15 @@ class DataCollector:
         return file_name
 
     def __create_file_name(self) -> str:
-        """ creates a image file name with png. 
+        """creates a image file name with png.
         The format of the file name is, year, month, day, hour, minutes, and second.
 
         Returns:
             str: file name
         """
-        
+
         now = datetime.now()
         date_time = now.strftime("%Y%m%d%H%M%S")
         file_name = date_time + ".png"
 
         return file_name
-
-
-
-

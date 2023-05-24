@@ -3,9 +3,10 @@
 from recognizer.components.region_extractor import MovingAverageTracker
 from recognizer.io.save_image_s3 import S3ImageIO
 
+
 class TestMovingAverageTracker:
     def test_init(self) -> None:
-        
+
         tracker = MovingAverageTracker()
 
         assert isinstance(tracker, MovingAverageTracker)
@@ -17,7 +18,7 @@ class TestMovingAverageTracker:
         # img_file_name_list = [item for item in mock_s3_dataset.blob if "moving_average" in item]
 
         print(img_file_name_list)
-        
+
         for i_target, img_file_name in enumerate(img_file_name_list):
             target = mock_s3_dataset.load(img_file_name)
             print(type(target))
@@ -29,4 +30,3 @@ class TestMovingAverageTracker:
             for i_img, cropped_img in enumerate(cropped_img_list):
                 print(f">> {i_img}th image shape: ", cropped_img.shape)
                 mock_s3.save(cropped_img, f"hoge_{i_target}_{i_img}.png")
-                

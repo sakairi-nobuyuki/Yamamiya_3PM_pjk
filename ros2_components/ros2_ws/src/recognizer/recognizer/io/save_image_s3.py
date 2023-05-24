@@ -2,10 +2,14 @@
 import boto3
 import cv2
 import numpy as np
+
 from . import IOTemplate
 
+
 class S3ImageIO(IOTemplate):
-    def __init__(self, endpoint_url: str, access_key: str, secret_key: str, bucket_name: str) -> None:
+    def __init__(
+        self, endpoint_url: str, access_key: str, secret_key: str, bucket_name: str
+    ) -> None:
         """
         Initializes S3Image class with access_key, secret_key and bucket_name.
 
@@ -18,14 +22,19 @@ class S3ImageIO(IOTemplate):
         None
         """
         print("Initializing storage")
-        self.s3 = boto3.resource('s3', endpoint_url=endpoint_url, aws_access_key_id=access_key, aws_secret_access_key=secret_key)
+        self.s3 = boto3.resource(
+            "s3",
+            endpoint_url=endpoint_url,
+            aws_access_key_id=access_key,
+            aws_secret_access_key=secret_key,
+        )
         self.bucket_name = bucket_name
         self.bucket = self.s3.Bucket(self.bucket_name)
         self.blob = self.get_blob()
         print(">> endpoint: ", endpoint_url)
         print(">> bucket name: ", bucket_name)
         print(">> blob: ", self.blob)
-    
+
     def get_blob(self) -> list[str]:
         """
         Returns a list of all file names in the S3 bucket.
@@ -52,7 +61,7 @@ class S3ImageIO(IOTemplate):
         Returns:
         dict: Response from S3 bucket.
         """
-        _, img_encoded = cv2.imencode('.png', image)
+        _, img_encoded = cv2.imencode(".png", image)
         response = self.bucket.put_object(Key=key, Body=img_encoded.tostring())
         return response
 
@@ -68,7 +77,7 @@ class S3ImageIO(IOTemplate):
         """
         obj = self.bucket.Object(key=key)
         response = obj.get()
-        file_stream = response['Body']
+        file_stream = response["Body"]
         file_bytes = np.asarray(bytearray(file_stream.read()), dtype=np.uint8)
         image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
         return image

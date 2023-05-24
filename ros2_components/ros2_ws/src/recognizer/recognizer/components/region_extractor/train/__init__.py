@@ -1,4 +1,5 @@
 # coding: utf-8
 from .thresholding_trainer_template import ThresholdingTrainerTemplate
-from .thresholding_hsv_trainer import ThresholdingTrainer
+from .thresholding_hsv_trainer import ThresholdingHsvTrainer
 from .object_filter_trainer import ObjectFilterTrainer
+from .thresholding_saturation_trainer import ThresholdingSaturationTrainer
