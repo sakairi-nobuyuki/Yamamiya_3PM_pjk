@@ -3,7 +3,6 @@
 from typing import Any, Dict
 
 from . import (
-    DetectorTemplate,
     FactoryTemplate,
     ThresholdingDetectorHsv,
     ThresholdingDetectorSaturate,

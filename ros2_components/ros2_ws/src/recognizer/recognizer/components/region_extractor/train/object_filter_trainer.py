@@ -4,9 +4,6 @@ from typing import Dict
 
 import cv2
 import numpy as np
-from recognizer.components.region_extractor import (
-    ThresholdingDetectorHsv as ThresholdingDetector,
-)
 from recognizer.io import S3ImageIO
 
 
@@ -28,9 +25,8 @@ class ObjectFilterTrainer:
         else:
             self.image_s3 = image_s3
         self.file_name_list = [
-            item for item in self.image_s3.blob if "region_extractor/thresholding_train" in item
+            item for item in self.image_s3.blob if "region_extractor/object_filter_train" in item
         ]
-        self.detector = ThresholdingDetector(type="saturation", threshold_value=100)
 
     def run(self) -> Dict[str, str]:
         """Run optimization.
@@ -48,17 +44,20 @@ class ObjectFilterTrainer:
 
     def __get_object_size(self) -> np.ndarray:
 
-        object_list = []
-        for file_name in self.file_name_list:
-            img = self.image_s3.load(file_name)
-            contours = self.detector.get_contours(img)
-            contour_list = []
-            for contour in contours:
-                x, y, w, h = cv2.boundingRect(contour)
-                contour_list.append([h, w])
-            object_list.append(max(list(map(lambda x: x[np.argmax(x[0] * x[1])], contour_list))))
-            # print("  object_list: ", object_list)
-            # object_list.append(max(list(map(lambda x: x[0] * x[1], contour_list))))
-        size_array = np.array(object_list)
-        print("object size: ", size_array)
-        return size_array
+        return list(
+            map(
+                lambda x: max(self.image_s3.load(x).shape[0:2]),
+                [file_name for file_name in self.file_name_list]
+            )
+        )
+
+        # object_list = []
+        # for file_name in self.file_name_list:
+        #     img = self.image_s3.load(file_name)
+        #     _, w, h = img.shape
+        #     object_list.append(max(list(map(lambda x: x[np.argmax(x[0] * x[1])], contour_list))))
+        #     # print("  object_list: ", object_list)
+        #     # object_list.append(max(list(map(lambda x: x[0] * x[1], contour_list))))
+        # size_array = np.array(object_list)
+        # print("object size: ", size_array)
+        # return size_array
