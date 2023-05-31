@@ -17,7 +17,13 @@ class TestVggLikeClassifierFactory:
     def test_create_model(self):
         model = self.factory.create_model()
         print(model.classifier[-1].in_features, model.classifier[-1].out_features)
-        print(model.features)
+        print("model.fetures: ", model.features)
+        print("type(model): ", type(model))
+        print("model parameters: ", model.parameters)
+        print("model named parameters: ", model.named_parameters)
+        print("model feat[0]: ", model.classifier[0].in_features)
+        print("model feat[0]: ", model.features[0])
+        model.eval()
         assert isinstance(model, models.vgg.VGG)
         assert model.classifier[-1].out_features == 2
 
@@ -29,4 +35,4 @@ class TestVggLikeClassifierFactory:
 
         forward = self.factory.create_forward()
 
-        print(forward(input_tensor))
+        print("forward: ", forward(input_tensor))

@@ -1,5 +1,5 @@
 # coding: utf-8
-from typing import Dict
+from typing import Dict, List
 
 import boto3
 import cv2
@@ -37,7 +37,7 @@ class S3ConfigIO(IOTemplate):
         print(">> endpoint: ", endpoint_url)
         print(">> bucket name: ", bucket_name)
         print(">> blob: ", self.blob)
-    def get_blob(self) -> list[str]:
+    def get_blob(self) -> List[str]:
         """
         Returns a list of all file names in the S3 bucket.
 

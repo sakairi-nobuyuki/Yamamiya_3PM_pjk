@@ -37,7 +37,7 @@ WORKDIR ${HOME}/app
 RUN sudo chown -R ${USER_NAME} ${HOME}  && sudo chmod -R 777 ${HOME}
 
 RUN sudo apt update && \
-    sudo apt install --no-install-recommends -y python3-pip curl unzip build-essential libgl1-mesa-glx
+    sudo apt install --no-install-recommends -y python3-pip curl unzip build-essential libgl1-mesa-glx git
     # sudo update-alternatives --install /usr/local/bin/python python /usr/bin/python3.10 1 && \
 RUN pip install --upgrade pip
 

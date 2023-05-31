@@ -11,6 +11,7 @@ from ml_components.train import TemplateTrainer
 from tqdm import tqdm
 
 class VggLikeClassifierTrainer(TemplateTrainer):
+    """Train a binary classifier from VGG"""
     def __init__(
         self,
         data_path: str,
@@ -18,6 +19,21 @@ class VggLikeClassifierTrainer(TemplateTrainer):
         dataloader_factory: BinaryClassifierDataloaderFactory,
         n_epoch: int = 100,
     ) -> None:
+        """Constructor
+        - Initialize torch
+        - Create model from VGG
+        - Configure a sequential network
+        - Configure a data loader
+
+        Args:
+            data_path (str): Train data path
+            factory (ModelFactoryTemplate): An instance of model factory
+            dataloader_factory (BinaryClassifierDataloaderFactory): An instance of data loader factory
+            n_epoch (int, optional): Number of epoch. Defaults to 100.
+
+        Raises:
+            TypeError: Raise a type error for the model factory
+        """
         if not isinstance(factory, ModelFactoryTemplate):
             raise TypeError(f"{type(factory) is not {ModelFactoryTemplate}}")
         self.device = torch.device('cuda')

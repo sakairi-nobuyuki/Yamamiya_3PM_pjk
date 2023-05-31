@@ -3,7 +3,7 @@
 import pytest
 import torch
 
-from ml_components.io import S3ImageIO
+from ml_components.io import S3ImageIO, OnnxS3
 
 
 @pytest.fixture
@@ -36,3 +36,11 @@ def mock_s3_dataset():
         secret_key="sigma-chan-dayo",
         bucket_name="dataset",
     )
+
+@pytest.fixture
+def mock_s3_onnx():
+    return OnnxS3(
+        endpoint_url="http://192.168.1.194:9000",
+        access_key="sigma-chan",
+        secret_key="sigma-chan-dayo",
+        bucket_name="models")
