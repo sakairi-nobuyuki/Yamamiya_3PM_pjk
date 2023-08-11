@@ -37,4 +37,5 @@ class TestVggLikeClassifierPredictor:
         for file_path in file_list:
             image = cv2.imread(file_path)
             assert isinstance(image, np.ndarray)
+            print(file_path)
             predictor.predict(image)

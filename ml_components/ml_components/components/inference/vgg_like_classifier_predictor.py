@@ -5,6 +5,7 @@ import torch
 import torchvision
 import torchvision.models as models
 import numpy as np
+import cv2
 
 from .template_predictor import TemplatePredictor
 from ...models.factory import ModelFactoryTemplate
@@ -42,6 +43,14 @@ class VggLikeClassifierPredictor(TemplatePredictor):
         # Set the model to evaluation mode
         self.model.eval()
 
+        self.prediction_transform = torchvision.transforms.Compose(
+            [
+                torchvision.transforms.ToTensor(),
+                torchvision.transforms.Resize(224),
+                torchvision.transforms.CenterCrop(224),
+                torchvision.transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+            ]
+        )
 
 
     def predict(self, image: np.ndarray) -> bool:
@@ -53,23 +62,8 @@ class VggLikeClassifierPredictor(TemplatePredictor):
         Returns:
             bool: Classified result.
         """
-        # Prepare your input data
-        # For example, load an image and transform it to a tensor
-        input = torch.from_numpy(image)
-
-        # Resize and crop the image to 224 x 224
-        input = torchvision.transforms.functional.resize(input, 224)
-        input = torchvision.transforms.functional.center_crop(input, 224)
-
-        # Permute the channels to (C, H, W)
-        input = input.permute(2, 0, 1)
-
-        # Normalize the image with the same mean and std as ImageNet
-        input = torchvision.transforms.functional.normalize(
-            input,
-            mean=[0.485, 0.456, 0.406],
-            std=[0.229, 0.224, 0.225]
-        )
+        ### Transform input image to a tensor with some preprocess
+        input = self.prediction_transform(image)
 
         # Add a batch dimension
         input = input.unsqueeze(0)
