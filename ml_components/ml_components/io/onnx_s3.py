@@ -45,17 +45,19 @@ class OnnxS3(IOTemplate):
         model = torch.load("pytorch_model.pth", map_location=torch.device('cpu'))
 
     def save(self, input: models.vgg.VGG, key: str) -> dict:
-
+        print(">> save onnx: ", key)
         # Convert the PyTorch model to ONNX format using a dummy input
         dummy_input = torch.rand(1, 3, 224, 224) # change this according to your model input shape
-        export_onnx_name = "model.onnx"
+        export_onnx_name = key
         torch.onnx.export(input, dummy_input, export_onnx_name)
 
         object = self.bucket.Object(export_onnx_name)
         response = object.put(Body=open(export_onnx_name, 'rb'))
-        os.remove(export_onnx_name)
-        if os.path.exists(export_onnx_name):
-            raise Exception(f"Temporary onnx file is failed to delete")
+        try:
+            os.remove(export_onnx_name)
+        except Exception as e:
+            print(f"Failed to delete temporary ONNX file: {e}")
+
 
         return response
 

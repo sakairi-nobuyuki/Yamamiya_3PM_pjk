@@ -9,8 +9,10 @@ app = typer.Typer()
 
 @app.command()
 def train():
-    trainer = TrainPipeline()
-    trainer.vgg_like.train()
+    io_cofig = dict(endpoint_url="http://192.168.1.194:9000", access_key="sigma-chan", secret_key="sigma-chan-dayo")
+    trainer = TrainPipeline(io_cofig)
+    trainer.trainer.train()
+    
 
 
 if __name__ == "__main__":

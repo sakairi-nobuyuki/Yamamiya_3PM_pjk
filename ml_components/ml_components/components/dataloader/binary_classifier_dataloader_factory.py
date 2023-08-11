@@ -34,8 +34,8 @@ class BinaryClassifierDataloaderFactory:
         )
 
         # Wrap datasets with DataLoader class
-        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
-        val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=32, shuffle=False)
+        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True)
+        val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=64, shuffle=False)
 
         # self.s3.delete_local(data_path)
 

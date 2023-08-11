@@ -2,9 +2,11 @@
 
 import pytest
 import torch
+from typing import Dict
 
 from ml_components.io import S3ImageIO, OnnxS3
 
+minio_endpoint_url="http://192.168.1.194:9000"
 
 @pytest.fixture
 def mock_dataloader() -> torch.utils.data.DataLoader:
@@ -31,7 +33,7 @@ def mock_dataloader() -> torch.utils.data.DataLoader:
 @pytest.fixture
 def mock_s3_dataset():
     return S3ImageIO(
-        endpoint_url="http://192.168.1.194:9000",
+        endpoint_url=minio_endpoint_url,
         access_key="sigma-chan",
         secret_key="sigma-chan-dayo",
         bucket_name="dataset",
@@ -40,7 +42,12 @@ def mock_s3_dataset():
 @pytest.fixture
 def mock_s3_onnx():
     return OnnxS3(
-        endpoint_url="http://192.168.1.194:9000",
+        endpoint_url=minio_endpoint_url,
         access_key="sigma-chan",
         secret_key="sigma-chan-dayo",
         bucket_name="models")
+
+@pytest.fixture
+def mock_io_module_config_dict() -> Dict[str, str]:
+    return dict(endpoint_url=minio_endpoint_url, access_key="sigma-chan",
+        secret_key="sigma-chan-dayo")
