@@ -150,3 +150,7 @@ log/
 
 ### dataset
 classifier/
+kaggle.json
+
+### config
+config/

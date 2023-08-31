@@ -2,3 +2,4 @@
 
 from .template_predictor import TemplatePredictor
 from .vgg_like_classifier_predictor import VggLikeClassifierPredictor
+from .inference_context import InferenceContext

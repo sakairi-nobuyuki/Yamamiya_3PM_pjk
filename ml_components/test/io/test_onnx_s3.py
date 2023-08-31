@@ -1,14 +1,16 @@
 # coding: utf-8
 
+from unittest.mock import MagicMock
+
 import boto3
 from moto import mock_s3
-from unittest.mock import MagicMock
 
 from ml_components.io import OnnxS3
 from ml_components.models.factory import VggLikeClassifierFactory
 
+
 class TestOnnxS3:
-#    @mock_s3
+    #    @mock_s3
     def test_save(sefl, mock_s3_onnx: OnnxS3):
         # Create an S3 bucket
         s3 = mock_s3_onnx

@@ -37,6 +37,8 @@ services:
         - /dev/video0:/dev/video0
     environment:
       - ENDPOINT_URL=${ENDPOINT_URL}
+      - ACCESS_KEY_ID=sigma-chan
+      - SECRET_ACCESS_KEY=sigma-chan-dayo
       - DISPLAY=${ENDPOINT_URL}:0
 #      - LIBGL_ALWAYS_INDIRECT=""
     volumes:

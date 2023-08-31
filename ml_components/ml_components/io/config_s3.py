@@ -37,6 +37,7 @@ class S3ConfigIO(IOTemplate):
         print(">> endpoint: ", endpoint_url)
         print(">> bucket name: ", bucket_name)
         print(">> blob: ", self.blob)
+
     def get_blob(self) -> List[str]:
         """
         Returns a list of all file names in the S3 bucket.
@@ -50,6 +51,7 @@ class S3ConfigIO(IOTemplate):
         file_names = []
         for obj in self.bucket.objects.all():
             file_names.append(obj.key)
+        self.blob = file_names
         return file_names
 
     def save(self, input: Dict[str, str], key: str) -> None:
@@ -63,6 +65,8 @@ class S3ConfigIO(IOTemplate):
         Returns:
         dict: Response from S3 bucket.
         """
+        if not isinstance(input, Dict):
+            raise TypeError(f"input config dict is not a Dict: {input}")
         yaml_dict = yaml.dump(input)
 
         response = self.bucket.put_object(Key=key, Body=yaml_dict)

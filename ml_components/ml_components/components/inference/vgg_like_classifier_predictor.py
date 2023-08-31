@@ -1,18 +1,19 @@
 # coding: utf-8
 
 import os
+
+import cv2
+import numpy as np
 import torch
 import torchvision
 import torchvision.models as models
-import numpy as np
-import cv2
 
-from .template_predictor import TemplatePredictor
 from ...models.factory import ModelFactoryTemplate
+from .template_predictor import TemplatePredictor
+
 
 class VggLikeClassifierPredictor(TemplatePredictor):
-
-    def __init__(self, model_path: str, model_factory: ModelFactoryTemplate)->None:
+    def __init__(self, model_path: str, model_factory: ModelFactoryTemplate) -> None:
         """Initialize predictor.
         - load model
 
@@ -32,7 +33,7 @@ class VggLikeClassifierPredictor(TemplatePredictor):
         checkpoint = torch.load(model_path)
 
         # Extract the model parameters
-        model_params = checkpoint['model_state_dict']
+        model_params = checkpoint["model_state_dict"]
 
         # Create a model instance with factory
         self.model = model_factory.create_model()
@@ -48,10 +49,11 @@ class VggLikeClassifierPredictor(TemplatePredictor):
                 torchvision.transforms.ToTensor(),
                 torchvision.transforms.Resize(224),
                 torchvision.transforms.CenterCrop(224),
-                torchvision.transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+                torchvision.transforms.Normalize(
+                    [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
+                ),
             ]
         )
-
 
     def predict(self, image: np.ndarray) -> bool:
         """Returns a predicted result of binary classification.
@@ -75,7 +77,6 @@ class VggLikeClassifierPredictor(TemplatePredictor):
         # For example, use the maximum score as the predicted class
         _, predicted = torch.max(output.data, 1)
 
-        print('Predicted class:', predicted.item())
+        #        print('Predicted class:', predicted.item())
 
         return predicted.item()
-        

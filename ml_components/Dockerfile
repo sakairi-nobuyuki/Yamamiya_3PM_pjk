@@ -68,5 +68,10 @@ RUN poetry config virtualenvs.create false && \
     poetry export -f requirements.txt --output requirements.txt --without-hashes && \
     pip3 install -r requirements.txt --user --no-deps
 
+### Copy kaggle token
+WORKDIR ${home}/.kaggle
+COPY kaggle.json ${home}/.kaggle
+RUN sudo chmod 600 ${home}/.kaggle/kaggle.json
+
 CMD ["/bin/bash"]
 

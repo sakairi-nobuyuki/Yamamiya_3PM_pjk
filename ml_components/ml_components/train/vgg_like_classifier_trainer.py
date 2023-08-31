@@ -1,21 +1,22 @@
 # coding: utf-8
 
-from typing import Any, Dict
 import shutil
+from datetime import datetime
+from typing import Any, Dict
+
 import torch
 import torch.nn as nn
-from datetime import datetime
-
-
+from tqdm import tqdm
 
 from ml_components.components.dataloader import BinaryClassifierDataloaderFactory
+from ml_components.io import DataTransferS3, IOTemplate
 from ml_components.models.factory import ModelFactoryTemplate
 from ml_components.train import TemplateTrainer
-from ml_components.io import IOTemplate, DataTransferS3
-from tqdm import tqdm
+
 
 class VggLikeClassifierTrainer(TemplateTrainer):
     """Train a binary classifier from VGG"""
+
     def __init__(
         self,
         data_path: str,
@@ -41,8 +42,8 @@ class VggLikeClassifierTrainer(TemplateTrainer):
         """
         if not isinstance(factory, ModelFactoryTemplate):
             raise TypeError(f"{type(factory) is not {ModelFactoryTemplate}}")
-        
-        self.device = torch.device('cuda')
+
+        self.device = torch.device("cuda")
         self.io = io
         self.factory = factory
         self.model = self.factory.create_model()
@@ -83,8 +84,6 @@ class VggLikeClassifierTrainer(TemplateTrainer):
         print("File name to upload: ", file_name)
         self.io.save(file_name, f"binary_classifier/vgg_base/{file_name}")
         map(shutil.rmtree, [item for item in summary_list["file_name"]])
-        
-        
 
     def iterate_train(self, model: Any, dataloader: torch.utils.data.DataLoader) -> float:
         model.train()
@@ -104,7 +103,9 @@ class VggLikeClassifierTrainer(TemplateTrainer):
         train_loss = train_loss / float(len(dataloader))
         return train_loss
 
-    def iterate_validation(self, model: Any, dataloader: torch.utils.data.DataLoader) -> float:
+    def iterate_validation(
+        self, model: Any, dataloader: torch.utils.data.DataLoader
+    ) -> float:
         model.eval()
         validation_loss = 0.0
         with torch.no_grad():
@@ -116,32 +117,32 @@ class VggLikeClassifierTrainer(TemplateTrainer):
                 validation_loss += loss.item()
         return validation_loss / float(len(dataloader))
 
-    def save_model(self, epoch: int, model: Any, train_loss: float, val_loss: float, model_name: str = None) -> Dict[str, str]:
-        
+    def save_model(
+        self,
+        epoch: int,
+        model: Any,
+        train_loss: float,
+        val_loss: float,
+        model_name: str = None,
+    ) -> Dict[str, str]:
         # Save a checkpoint of the model
         checkpoint = {
-            'epoch': epoch,
-            'model_state_dict': model.state_dict(),
-            'optimizer_state_dict': self.optimizer.state_dict(),
-            'train_loss': train_loss,
+            "epoch": epoch,
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": self.optimizer.state_dict(),
+            "train_loss": train_loss,
         }
         current_time = datetime.now().strftime("%Y%m%d")
         if model_name is None:
-            file_name = f'checkpoint_{current_time}_{epoch}epoch_train_loss{train_loss}_val_loss{val_loss}.pth'
+            file_name = f"checkpoint_{current_time}_{epoch}epoch_train_loss{train_loss}_val_loss{val_loss}.pth"
         else:
             file_name = model_name
         torch.save(checkpoint, file_name)
         print(f"save model: {file_name}")
-        # self.io.save(file_name, f"binary_classifier/vgg_base/{file_name}")
-        # self.io.delete_local(file_name)
-        
-        # self.io.save(checkpoint, f'checkpoint_{current_time}_{epoch}.onnx')
-        
-        # self.io.save(model.to(torch.device("cpu")), f'checkpoint_{current_time}_{epoch}.onnx')
-        # model.to(self.device)
+
         return {"file_name": file_name, "train_loss": train_loss, "val_loss": val_loss}
 
+
 def main():
-    """Production code should be implemented here for simplicity
-    """
+    """Production code should be implemented here for simplicity"""
     pass

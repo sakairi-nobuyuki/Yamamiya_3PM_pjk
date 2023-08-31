@@ -1,11 +1,11 @@
 # coding: utf-8
 import os
 import shutil
+from typing import List
 
 import boto3
 import cv2
 import numpy as np
-from typing import List
 
 from ml_components.io import IOTemplate
 
@@ -37,7 +37,8 @@ class S3ImageIO(IOTemplate):
         self.blob = self.get_blob()
         print(">> endpoint: ", endpoint_url)
         print(">> bucket name: ", bucket_name)
-        print(">> blob: ", self.blob)
+        print(">> blob length: ", len(self.blob))
+
     def get_blob(self) -> List[str]:
         """
         Returns a list of all file names in the S3 bucket.

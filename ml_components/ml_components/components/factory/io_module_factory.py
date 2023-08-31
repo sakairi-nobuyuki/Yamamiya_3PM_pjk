@@ -1,9 +1,10 @@
 # coding: utf-8
 
-from typing import List, Any, Dict
+from typing import Any, Dict, List
 
-from ml_components.io import S3ConfigIO, S3ImageIO, OnnxS3, DataTransferS3, IOTemplate
 from ml_components.components.factory import TemplateFactory
+from ml_components.io import DataTransferS3, IOTemplate, OnnxS3, S3ConfigIO, S3ImageIO
+
 
 class IoModuleFactory(TemplateFactory):
     def __init__(self, endpoint_url: str, access_key: str, secret_key: str):
@@ -16,15 +17,21 @@ class IoModuleFactory(TemplateFactory):
         self.secret_key = secret_key
 
     def create(self, *args: List[str], **kwargs: Dict[str, str]) -> IOTemplate:
-
         if kwargs["type"] == "onnx":
-            return OnnxS3(self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"])
+            return OnnxS3(
+                self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
+            )
         elif kwargs["type"] == "image":
-            return S3ImageIO(self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"])
+            return S3ImageIO(
+                self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
+            )
         elif kwargs["type"] == "config":
-            return S3ConfigIO(self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"])
+            return S3ConfigIO(
+                self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
+            )
         elif kwargs["type"] == "transfer":
-            return DataTransferS3(self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"])
+            return DataTransferS3(
+                self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
+            )
         else:
             raise NotImplementedError(f"{kwargs['type']} is not implemented")
-        
