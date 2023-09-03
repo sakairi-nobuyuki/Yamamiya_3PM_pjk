@@ -42,7 +42,9 @@ class TemplateDatasetLoader(metaclass=ABCMeta):
         # file_list = glob.glob(f"{temp_dataset_path}/kagglecatsanddogs_3367a/PetImages/{class_name}/*.*")
         file_list = [
             # os.path.join(item.split("/")[-2], item.split("/")[-1]) for item in file_list
-            item.split("/")[-1] for item in file_list if item.split("/")[-2] == class_name
+            item.split("/")[-1]
+            for item in file_list
+            if item.split("/")[-2] == class_name
         ]
         file_list_length = len(file_list)
 

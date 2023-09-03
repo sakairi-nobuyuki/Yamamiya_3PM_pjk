@@ -1,12 +1,14 @@
 # coding: utf-8
 
 from typing import Optional
+
 from pydantic import BaseModel
+
 
 class PredictionParameters(BaseModel):
     """Prediction parametres.
     In the top level parameters data class, basic configuration of the inference is set.
-    Detail configuration such as thresholding values, input image dimension or other items should be implemented sub-dataclass of 
+    Detail configuration such as thresholding values, input image dimension or other items should be implemented sub-dataclass of
     this dataclass.
 
     Attributes:
@@ -21,8 +23,8 @@ class PredictionParameters(BaseModel):
     Args:
         BaseModel (_type_): Inhering pydantic.BaseModel
     """
+
     model_path: str
     base_model: Optional[str] = None
     category: str = "dnn"
     type: str = "binary"
-    

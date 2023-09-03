@@ -79,10 +79,10 @@ class DataTransferS3(IOTemplate):
         Returns:
         np.ndarray: Loaded image.
         """
+        file_name = os.path.basename(key)
+        self.bucket.download_file(key, file_name)
 
-        self.bucket.download_file(key, os.path.basename(key))
-
-        return {"status": "200"}
+        return {"status": "200", "file_name": file_name}
 
     def delete(self, key: str) -> None:
         """

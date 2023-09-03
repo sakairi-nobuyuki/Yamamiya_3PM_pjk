@@ -114,16 +114,18 @@ class KaggleDatasetLoader(TemplateDatasetLoader):
         print(">>   uploading dataset to storage")
         for label, file_path_list_phase_dict in file_path_list_dict.items():
             for phase, file_path_list in file_path_list_phase_dict.items():
-                print(f">>   configuring {label}, {phase} data. totally {len(file_path_list)}")
+                print(
+                    f">>   configuring {label}, {phase} data. totally {len(file_path_list)}"
+                )
                 for file_path in file_path_list:
-                    #print(phase, file_path)
+                    # print(phase, file_path)
                     # file_name = file_path.split("/")[-1]
                     ### TODO: {something} of this file path is needed
                     ### from: /home/${USER}/app/{self.parameters.local_dir}/{something}/{label_name}/{file_name}
                     file_name = file_path
                     file_path = os.path.join(file_path_intersection, label, file_path)
                     file_key = f"{self.parameters.s3_dir}/{phase}/{label}/{file_name}"
-                    
+
                     self.s3_io.s3.meta.client.upload_file(
                         file_path, self.s3_io.bucket_name, file_key
                     )

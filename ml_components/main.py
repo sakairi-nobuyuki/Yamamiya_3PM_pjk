@@ -11,7 +11,9 @@ app = typer.Typer()
 
 @app.command("train")
 def train(
-    parapmeters: str = typer.Argument(..., help="train parameters yaml path in cloud storage")
+    parapmeters: str = typer.Argument(
+        ..., help="train parameters yaml path in cloud storage"
+    )
 ):
     io_cofig = dict(
         endpoint_url=f"http://{os.environ['ENDPOINT_URL']}:9000",
@@ -22,12 +24,19 @@ def train(
     trainer = TrainPipeline(io_cofig, parapmeters)
     trainer.trainer.train()
 
+
 @app.command("predict")
-def predict_core(parameters_path: str = typer.Argument(..., help="prediction parameters yaml path in local")):
+def predict_core(
+    parameters_path: str = typer.Argument(
+        ..., help="prediction parameters yaml path in local"
+    )
+):
     pass
+
 
 def predict():
     pass
+
 
 if __name__ == "__main__":
     app()

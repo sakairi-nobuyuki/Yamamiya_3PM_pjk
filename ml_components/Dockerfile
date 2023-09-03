@@ -70,7 +70,7 @@ RUN poetry config virtualenvs.create false && \
 
 ### Copy kaggle token
 WORKDIR ${home}/.kaggle
-COPY kaggle.json ${home}/.kaggle
+COPY kaggle.json ${home}/.kaggle/kaggle.json
 RUN sudo chmod 600 ${home}/.kaggle/kaggle.json
 
 CMD ["/bin/bash"]

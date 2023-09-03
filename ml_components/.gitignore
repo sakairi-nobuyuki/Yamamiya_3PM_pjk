@@ -154,3 +154,6 @@ kaggle.json
 
 ### config
 config/
+
+### models
+*.pth*

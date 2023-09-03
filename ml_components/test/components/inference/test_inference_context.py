@@ -1,10 +1,16 @@
 # coding: utf-8
 
 import os
+
 import torch
 
-from ml_components.components.inference import InferenceContext, TemplatePredictor, VggLikeClassifierPredictor
+from ml_components.components.inference import (
+    InferenceContext,
+    TemplatePredictor,
+    VggLikeClassifierPredictor,
+)
 from ml_components.models.factory import VggLikeClassifierFactory
+
 
 class TestInferenceContext:
     def test_init_vgg_like(self):
@@ -22,9 +28,9 @@ class TestInferenceContext:
         }
         torch.save(checkpoint, model_name)
 
-        inference_context = InferenceContext(VggLikeClassifierPredictor(model_name, factory)) 
+        inference_context = InferenceContext(
+            VggLikeClassifierPredictor(model_name, factory)
+        )
         assert isinstance(inference_context, InferenceContext)
 
         os.remove(model_name)
-
-        
