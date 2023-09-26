@@ -1,7 +1,10 @@
 # coding: utf-8
 
+<<<<<<< HEAD
 import os
 
+=======
+>>>>>>> a16a2c25e0d9cf3b4d429dcef6baf6a64520a119
 import typer
 
 from ml_components.pipelines import TrainPipeline
@@ -9,6 +12,7 @@ from ml_components.pipelines import TrainPipeline
 app = typer.Typer()
 
 
+<<<<<<< HEAD
 @app.command("train")
 def train(
     parapmeters: str = typer.Argument(
@@ -36,6 +40,12 @@ def predict_core(
 
 def predict():
     pass
+=======
+@app.command()
+def train():
+    trainer = TrainPipeline()
+    trainer.vgg_like.train()
+>>>>>>> a16a2c25e0d9cf3b4d429dcef6baf6a64520a119
 
 
 if __name__ == "__main__":
