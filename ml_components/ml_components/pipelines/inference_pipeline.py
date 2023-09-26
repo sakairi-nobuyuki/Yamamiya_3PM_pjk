@@ -1,7 +1,7 @@
 # coding: utf-8
 
-import os
 import json
+import os
 from typing import Any, Dict
 
 import numpy as np
@@ -52,12 +52,12 @@ class InferencePipeline:
             print(">> prediction type: binary classification")
             print(">> model path: ", self.parameers.model_path)
             self.predictor = InferenceContext(
-                #VggLikeClassifierPredictor(self.parameers.model_path, self.model_factory)
+                # VggLikeClassifierPredictor(self.parameers.model_path, self.model_factory)
                 VggLikeClassifierPredictor(model_path["file_name"], self.model_factory)
             )
         else:
             raise NotImplementedError(f"{self.parameers.type} is not implemented")
         os.remove(model_path["file_name"])
 
-    def predict(self, input: np.ndarray) -> Any:
+    def run(self, input: np.ndarray) -> Any:
         return self.predictor.run(input)

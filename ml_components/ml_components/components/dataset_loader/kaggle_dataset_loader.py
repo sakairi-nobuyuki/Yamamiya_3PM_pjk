@@ -16,6 +16,7 @@ from .template_dataset_loader import TemplateDatasetLoader
 
 class KaggleDatasetLoader(TemplateDatasetLoader):
     def __init__(self, parameters: DatasetLoaderParameters, s3_io: S3ImageIO) -> None:
+        print("Kaggle dataset loader")
         if isinstance(parameters, DatasetLoaderParameters):
             self.parameters = parameters
         else:
@@ -62,9 +63,9 @@ class KaggleDatasetLoader(TemplateDatasetLoader):
 
         # os.makedirs(temp_dataset_path, exist_ok=True)
         kaggle.api.authenticate()
-        # kaggle.api.dataset_download_files(
-        #   self.parameters.dataset_name, path=temp_dataset_path, unzip=True
-        # )
+        kaggle.api.dataset_download_files(
+            self.parameters.dataset_name, path=temp_dataset_path, unzip=True
+        )
 
         # get label list
         print(">>   configuring dataset store")
@@ -86,6 +87,7 @@ class KaggleDatasetLoader(TemplateDatasetLoader):
             )
 
         ### get something
+        print(file_path_list)
         file_path_intersection = "/" + os.path.join(
             *[
                 file_path_segment_summary[0]
@@ -115,7 +117,7 @@ class KaggleDatasetLoader(TemplateDatasetLoader):
         for label, file_path_list_phase_dict in file_path_list_dict.items():
             for phase, file_path_list in file_path_list_phase_dict.items():
                 print(
-                    f">>   configuring {label}, {phase} data. totally {len(file_path_list)}"
+                    f">>   configuring {label}, {phase} data and uploading. totally {len(file_path_list)}"
                 )
                 for file_path in file_path_list:
                     # print(phase, file_path)
@@ -129,8 +131,9 @@ class KaggleDatasetLoader(TemplateDatasetLoader):
                     self.s3_io.s3.meta.client.upload_file(
                         file_path, self.s3_io.bucket_name, file_key
                     )
-
+        print(">> finished dataset configuration")
         # remove temporary local files
+        print(">> removing temporary files in local")
         shutil.rmtree(temp_dataset_path)
 
         return file_path_list

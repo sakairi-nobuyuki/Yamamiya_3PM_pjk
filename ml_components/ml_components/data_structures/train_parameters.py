@@ -8,7 +8,7 @@ from . import DatasetLoaderParameters
 
 
 class TrainParameters(BaseModel):
-    type: str = "binary"
+    type: str = "classification"
     dataset: Optional[DatasetLoaderParameters]
     n_epoch: int = 100
     n_classes: int = 2

@@ -26,7 +26,7 @@ class VggLikeClassifierPredictor(TemplatePredictor):
             FileNotFoundError: _description_
         """
         ### download and load the model, finally delete it.
-                
+
         if not isinstance(model_factory, ModelFactoryTemplate):
             raise TypeError(f"{model_factory} model is not that of ModelFactoryTemplate")
         if not os.path.exists(model_path):
@@ -67,6 +67,9 @@ class VggLikeClassifierPredictor(TemplatePredictor):
             bool: Classified result.
         """
         ### Transform input image to a tensor with some preprocess
+        if not isinstance(image, np.ndarray):
+            print(f"image is not np.array: {type(image), image}")
+            return -1
         input = self.prediction_transform(image)
 
         # Add a batch dimension

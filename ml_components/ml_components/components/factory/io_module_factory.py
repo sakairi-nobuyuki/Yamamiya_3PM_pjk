@@ -8,11 +8,11 @@ from ml_components.io import DataTransferS3, IOTemplate, OnnxS3, S3ConfigIO, S3I
 
 
 class IoModuleFactory(TemplateFactory):
-    def __init__(self, endpoint_url: str = None, access_key: str = None, secret_key: str = None):
+    def __init__(
+        self, endpoint_url: str = None, access_key: str = None, secret_key: str = None
+    ):
         print("IO module factory:")
-        print(">> endpoint: ", endpoint_url)
-        print(">> access key: ", access_key)
-        print(">> secret key: ", secret_key)
+
         if endpoint_url is not None:
             self.endpoint_url = endpoint_url
         else:
@@ -25,6 +25,9 @@ class IoModuleFactory(TemplateFactory):
             self.secret_key = secret_key
         else:
             self.secret_key = os.getenv("SECRET_KEY")
+        print(">> endpoint: ", endpoint_url)
+        print(">> access key: ", access_key)
+        print(">> secret key: ", secret_key)
 
     def create(self, *args: List[str], **kwargs: Dict[str, str]) -> IOTemplate:
         """Requires input dict as,
@@ -41,19 +44,39 @@ class IoModuleFactory(TemplateFactory):
             IOTemplate: _description_
         """
         if kwargs["type"] == "onnx":
+            print(
+                ">> create onnx s3: ", self.endpoint_url, self.access_key, self.secret_key
+            )
             return OnnxS3(
                 self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
             )
         elif kwargs["type"] == "image":
+            print(
+                ">> create image s3: ",
+                self.endpoint_url,
+                self.access_key,
+                self.secret_key,
+            )
             return S3ImageIO(
                 self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
             )
         elif kwargs["type"] == "config":
+            print(
+                ">> create config s3: ",
+                self.endpoint_url,
+                self.access_key,
+                self.secret_key,
+            )
             return S3ConfigIO(
                 self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
             )
         elif kwargs["type"] == "transfer":
-            print("create transfer s3: ", self.endpoint_url, self.access_key, self.secret_key)
+            print(
+                ">> create transfer s3: ",
+                self.endpoint_url,
+                self.access_key,
+                self.secret_key,
+            )
             return DataTransferS3(
                 self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
             )

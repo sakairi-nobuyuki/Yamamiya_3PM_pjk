@@ -32,11 +32,11 @@ class S3ImageIO(IOTemplate):
             aws_access_key_id=access_key,
             aws_secret_access_key=secret_key,
         )
+        print(">> endpoint: ", endpoint_url)
+        print(">> bucket name: ", bucket_name)
         self.bucket_name = bucket_name
         self.bucket = self.s3.Bucket(self.bucket_name)
         self.blob = self.get_blob()
-        print(">> endpoint: ", endpoint_url)
-        print(">> bucket name: ", bucket_name)
         print(">> blob length: ", len(self.blob))
 
     def get_blob(self) -> List[str]:

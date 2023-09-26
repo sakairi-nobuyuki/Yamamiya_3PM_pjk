@@ -9,3 +9,5 @@ from .dataset_loader_parameters import (
 from .train_parameters import TrainParameters
 
 from .prediction_parameters import PredictionParameters
+
+from .accuracy_meas_parameters import AccuracyMeasurementParameters
