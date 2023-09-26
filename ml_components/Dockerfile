@@ -37,7 +37,7 @@ WORKDIR ${HOME}/app
 RUN sudo chown -R ${USER_NAME} ${HOME}  && sudo chmod -R 777 ${HOME}
 
 RUN sudo apt update && \
-    sudo apt install --no-install-recommends -y python3-pip curl unzip build-essential libgl1-mesa-glx
+    sudo apt install --no-install-recommends -y python3-pip curl unzip build-essential libgl1-mesa-glx git
     # sudo update-alternatives --install /usr/local/bin/python python /usr/bin/python3.10 1 && \
 RUN pip install --upgrade pip
 
@@ -67,6 +67,11 @@ RUN poetry config virtualenvs.create false && \
     poetry config installer.parallel false && \
     poetry export -f requirements.txt --output requirements.txt --without-hashes && \
     pip3 install -r requirements.txt --user --no-deps
+
+### Copy kaggle token
+WORKDIR ${home}/.kaggle
+COPY kaggle.json ${home}/.kaggle/kaggle.json
+RUN sudo chmod 600 ${home}/.kaggle/kaggle.json
 
 CMD ["/bin/bash"]
 

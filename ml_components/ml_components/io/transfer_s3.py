@@ -1,16 +1,15 @@
 # coding: utf-8
+
 import os
 import shutil
-from typing import List
+from typing import Any, List
 
 import boto3
-import cv2
-import numpy as np
 
 from ml_components.io import IOTemplate
 
 
-class S3ImageIO(IOTemplate):
+class DataTransferS3(IOTemplate):
     def __init__(
         self, endpoint_url: str, access_key: str, secret_key: str, bucket_name: str
     ) -> None:
@@ -32,12 +31,12 @@ class S3ImageIO(IOTemplate):
             aws_access_key_id=access_key,
             aws_secret_access_key=secret_key,
         )
-        print(">> endpoint: ", endpoint_url)
-        print(">> bucket name: ", bucket_name)
         self.bucket_name = bucket_name
         self.bucket = self.s3.Bucket(self.bucket_name)
         self.blob = self.get_blob()
-        print(">> blob length: ", len(self.blob))
+        print(">> endpoint: ", endpoint_url)
+        print(">> bucket name: ", bucket_name)
+        print(">> blob: ", self.blob)
 
     def get_blob(self) -> List[str]:
         """
@@ -54,7 +53,7 @@ class S3ImageIO(IOTemplate):
             file_names.append(obj.key)
         return file_names
 
-    def save(self, image: np.ndarray, key: str) -> dict:
+    def save(self, file_name: str, key: str) -> dict:
         """
         Saves an image to S3 bucket.
 
@@ -65,11 +64,12 @@ class S3ImageIO(IOTemplate):
         Returns:
         dict: Response from S3 bucket.
         """
-        _, img_encoded = cv2.imencode(".png", image)
-        response = self.bucket.put_object(Key=key, Body=img_encoded.tostring())
-        return response
+        # self.s3.Bucket(bucket_name).upload_file(file_path, key_name)
+        self.bucket.upload_file(file_name, key)
 
-    def load(self, key: str) -> np.ndarray:
+        return {"status": "200"}
+
+    def load(self, key: str) -> Any:
         """
         Loads an image from S3 bucket.
 
@@ -79,12 +79,10 @@ class S3ImageIO(IOTemplate):
         Returns:
         np.ndarray: Loaded image.
         """
-        obj = self.bucket.Object(key=key)
-        response = obj.get()
-        file_stream = response["Body"]
-        file_bytes = np.asarray(bytearray(file_stream.read()), dtype=np.uint8)
-        image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
-        return image
+        file_name = os.path.basename(key)
+        self.bucket.download_file(key, file_name)
+
+        return {"status": "200", "file_name": file_name}
 
     def delete(self, key: str) -> None:
         """
@@ -93,7 +91,7 @@ class S3ImageIO(IOTemplate):
         Parameters:
         key (str): File to be deleted
         """
-        self.bucket.objects.filter(Prefix="key").delete()
+        self.bucket.objects.filter(Prefix=key).delete()
 
     def download_s3_folder(self, s3_folder: str, local_dir: str = None) -> None:
         if local_dir is None:
@@ -110,6 +108,14 @@ class S3ImageIO(IOTemplate):
                 print("makedir: ", os.path.dirname(obj.key))
                 os.makedirs(os.path.dirname(obj.key))
             self.s3.Object(self.bucket.name, obj.key).download_file(obj.key)
+
+    def upload_s3_foldeer(self, local_dir: str, s3_folder: str) -> None:
+        if not os.path.exists(local_dir):
+            raise FileNotFoundError(f"{local_dir} is not found in local")
+
+            s3.meta.client.upload_file("local_file_path", self.bucket_name, "key_name")
+
+        pass
 
     def delete_local(self, local_dir: str) -> None:
         shutil.rmtree(local_dir)

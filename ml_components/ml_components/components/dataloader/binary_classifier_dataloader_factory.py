@@ -22,20 +22,34 @@ class BinaryClassifierDataloaderFactory:
         self.s3 = s3
 
     def create(self, data_path: str) -> ClassifierDataloaderDataclass:
+        """Create Dataloader Dataclass from a dataset stored in a local storage.
+
+        Args:
+            data_path (str): Dataset path in a storage.
+
+        Returns:
+            ClassifierDataloaderDataclass: Dataloader dataclass.
+        """
         # Downloading data
         # self.s3.download_s3_folder(data_path, local_dir=data_path)
         print(f"download files from {data_path}")
         self.s3.download_s3_folder(data_path)
 
         # Load images from directories using ImageFolder class
-        train_dataset = datasets.ImageFolder(f"{data_path}/train", transform=self.train_transforms)
+        train_dataset = datasets.ImageFolder(
+            f"{data_path}/train", transform=self.train_transforms
+        )
         val_dataset = datasets.ImageFolder(
             f"{data_path}/validation", transform=self.train_transforms
         )
 
         # Wrap datasets with DataLoader class
-        train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
-        val_loader = torch.utils.data.DataLoader(val_dataset, batch_size=32, shuffle=False)
+        train_loader = torch.utils.data.DataLoader(
+            train_dataset, batch_size=64, shuffle=True
+        )
+        val_loader = torch.utils.data.DataLoader(
+            val_dataset, batch_size=64, shuffle=False
+        )
 
         # self.s3.delete_local(data_path)
 

@@ -147,3 +147,13 @@ minio/
 ### ROS
 install/
 log/
+
+### dataset
+classifier/
+kaggle.json
+
+### config
+config/
+
+### models
+*.pth*
