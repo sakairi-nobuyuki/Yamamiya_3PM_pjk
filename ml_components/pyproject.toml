@@ -20,6 +20,8 @@ onnx = "^1.14.0"
 moto = "^4.1.10"
 kaggle = "^1.5.16"
 pydantic = "^2.1.1"
+setuptools = "^68.2.2"
+umap-learn = "^0.5.4"
 
 
 [tool.poetry.group.dev.dependencies]
