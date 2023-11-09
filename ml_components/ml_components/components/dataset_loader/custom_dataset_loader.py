@@ -1,9 +1,11 @@
 # coding: utf-8
 
 from typing import Dict, List
+
 from ...data_structures import DatasetLoaderParameters
 from ...io import S3ImageIO
 from .template_dataset_loader import TemplateDatasetLoader
+
 
 class CustomDatasetLoader(TemplateDatasetLoader):
     def __init__(self, parameters: DatasetLoaderParameters, s3_io: S3ImageIO) -> None:
@@ -21,27 +23,32 @@ class CustomDatasetLoader(TemplateDatasetLoader):
 
         self.is_dataset_in_the_storage()
 
+    def load(self):
         ### Get data path list of the target directory
-        file_path_list = [file_path for file_path in self.s3_io.blob if self.parameters.s3_dir in file_path]
+        file_path_list = [
+            file_path
+            for file_path in self.s3_io.blob
+            if self.parameters.s3_dir in file_path
+        ]
 
-        ### get numer of classes 
+        ### get numer of classes
         label_list = list(set([file_path.split("/")[-2] for file_path in file_path_list]))
         print(">> label list: ", label_list)
 
-        file_path_list_dict = {
-            label: self.create_separated_file_path_list(file_path_list, label)
-            for label in label_list
-        }
-        print(file_path_list_dict)
+        ### Create file path list of each classes
+        label_file_path_dict_list = [
+            {file_path: file_path.split("/")[-2]} for file_path in file_path_list
+        ]
 
-    def load(self):
-        pass
+        return label_file_path_dict_list
 
-    def create_separated_file_path_list(self, file_list: List[str], class_name: str) -> Dict[str, List[str]]:
+    def create_separated_file_path_list(
+        self, file_list: List[str], class_name: str
+    ) -> Dict[str, List[str]]:
         return super().create_separated_file_path_list(file_list, class_name)
-    
+
     def is_dataset_in_the_storage(self) -> bool:
         return super().is_dataset_in_the_storage()
-    
+
     def get_label_list(self) -> List[str]:
         return super().get_label_list()

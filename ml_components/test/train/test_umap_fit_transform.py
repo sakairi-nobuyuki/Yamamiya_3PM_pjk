@@ -1,14 +1,14 @@
 # coding: utf-8
 
 import numpy as np
-from sklearn.datasets import load_digits
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler
 
 # import matplotlib.pyplot as plt
 # import seaborn as sns
 import pandas as pd
 import umap
+from sklearn.datasets import load_digits
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
 
 
 def test_umap_digit():
@@ -32,4 +32,3 @@ def test_umap_digit():
     embedding.shape
 
     print([1, 2] + [3, 4])
-

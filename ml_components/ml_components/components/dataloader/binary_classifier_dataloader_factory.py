@@ -21,7 +21,13 @@ class BinaryClassifierDataloaderFactory:
         )
         self.s3 = s3
 
-    def create(self, data_path: str, batch_size: int = 64, shuffle_train: bool = True, shuffle_val = False) -> ClassifierDataloaderDataclass:
+    def create(
+        self,
+        data_path: str,
+        batch_size: int = 64,
+        shuffle_train: bool = True,
+        shuffle_val=False,
+    ) -> ClassifierDataloaderDataclass:
         """Create Dataloader Dataclass from a dataset stored in a local storage.
 
         Args:

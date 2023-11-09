@@ -75,7 +75,6 @@ class TemplateDatasetLoader(metaclass=ABCMeta):
 
         return dict(train=train_file_list, val=val_file_list, test=test_file_list)
 
-
     def is_dataset_in_the_storage(self) -> bool:
         ### If in the case of classifier
 

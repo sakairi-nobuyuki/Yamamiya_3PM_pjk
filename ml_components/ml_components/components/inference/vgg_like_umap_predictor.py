@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from . import UmapReducingPredictor, VggLikeFeatureExtractor, TemplatePredictor
 from ...models.factory import ModelFactoryTemplate
+from . import TemplatePredictor, UmapReducingPredictor, VggLikeFeatureExtractor
 
 
 class VggLikeUmapPredictor(TemplatePredictor):

@@ -1,15 +1,16 @@
 # coding: utf-8
 
+import glob
 import os
+
+import cv2
+import numpy as np
+import pytest
 import torch
 import torchvision
-import glob
-import numpy as np
-import cv2
-import pytest
 
-from ml_components.models.factory import VggLikeClassifierFactory
 from ml_components.components.inference import VggLikeFeatureExtractor
+from ml_components.models.factory import VggLikeClassifierFactory
 
 
 class TestVggLikeFeatureExtractor:
@@ -29,7 +30,7 @@ class TestVggLikeFeatureExtractor:
 
         torch.save(self.checkpoint, self.model_name)
 
-        extractor = VggLikeFeatureExtractor(self.model_name, self.factory)
+        extractor = VggLikeFeatureExtractor(self.factory, model_path=self.model_name)
 
         assert isinstance(extractor, VggLikeFeatureExtractor)
         assert isinstance(extractor.model, torchvision.models.vgg.VGG)
@@ -45,7 +46,7 @@ class TestVggLikeFeatureExtractor:
         torch.save(self.checkpoint, self.model_name)
 
         extractor = VggLikeFeatureExtractor(
-            self.model_name, self.factory, n_layer=n_layer
+            self.factory, n_layer=n_layer, model_path=self.model_name
         )
 
         assert isinstance(extractor, VggLikeFeatureExtractor)

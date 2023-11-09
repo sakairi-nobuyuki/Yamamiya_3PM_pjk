@@ -13,7 +13,10 @@ from .template_predictor import TemplatePredictor
 
 class VggLikeFeatureExtractor(TemplatePredictor):
     def __init__(
-        self, model_path: str, model_factory: ModelFactoryTemplate, n_layer: int = -1
+        self,
+        model_factory: ModelFactoryTemplate,
+        n_layer: int = -1,
+        model_path: str = None,
     ) -> None:
         """Initialize predictor.
         - load model
@@ -31,19 +34,19 @@ class VggLikeFeatureExtractor(TemplatePredictor):
         ### download and load the model, finally delete it.
         if not isinstance(model_factory, ModelFactoryTemplate):
             raise TypeError(f"{model_factory} model is not that of ModelFactoryTemplate")
-        if not os.path.exists(model_path):
-            raise FileNotFoundError(f"{model_path} is not found.")
-
-        checkpoint = torch.load(model_path)
-
-        # Extract the model parameters
-        model_params = checkpoint["model_state_dict"]
 
         # Create a model instance with factory
         self.model = model_factory.create_model()
 
-        # Load the parameters to the model instance
-        self.model.load_state_dict(model_params)
+        if model_path is not None:
+            if not os.path.exists(model_path):
+                raise FileNotFoundError(f"{model_path} is not found.")
+
+            # Extract the model parameters
+            checkpoint = torch.load(model_path)
+            model_params = checkpoint["model_state_dict"]
+            # Load the parameters to the model instance
+            self.model.load_state_dict(model_params)
 
         # Set the model to evaluation mode
         self.model.eval()

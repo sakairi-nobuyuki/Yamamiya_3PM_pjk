@@ -36,6 +36,8 @@ def predict_core(
 
 def predict():
     pass
+
+
 @app.command()
 def train():
     trainer = TrainPipeline()

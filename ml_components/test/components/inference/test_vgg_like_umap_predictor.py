@@ -1,16 +1,17 @@
 # coding: utf-8
 
-import os
 import glob
+import os
+
+import cv2
 import numpy as np
 import pytest
-import cv2
 import torch
 import torchvision
 
 from ml_components.components.inference import (
-    VggLikeUmapPredictor,
     VggLikeFeatureExtractor,
+    VggLikeUmapPredictor,
 )
 from ml_components.models.factory import VggLikeClassifierFactory
 

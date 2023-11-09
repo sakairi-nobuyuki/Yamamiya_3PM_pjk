@@ -1,16 +1,16 @@
 # coding: utf-8
 
 import os
-
 from typing import Dict
-import yaml
+
 import numpy as np
+import yaml
 
 from ..components.dataset_loader import KaggleDatasetLoader
 from ..components.factory import IoModuleFactory
-from ..data_structures import AccuracyMeasurementParameters
 from ..components.inference import InferenceContext, VggLikeClassifierPredictor
-from ..models.factory import VggLikeClassifierFactory, ModelFactoryTemplate
+from ..data_structures import AccuracyMeasurementParameters
+from ..models.factory import ModelFactoryTemplate, VggLikeClassifierFactory
 from . import TemplatePipeline
 
 

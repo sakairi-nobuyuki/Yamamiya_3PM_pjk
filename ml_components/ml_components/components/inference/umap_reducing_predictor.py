@@ -1,9 +1,10 @@
 # coding: utf-8
 
 import os
+
 import numpy as np
-from sklearn.preprocessing import StandardScaler
 import umap
+from sklearn.preprocessing import StandardScaler
 
 from .template_predictor import TemplatePredictor
 

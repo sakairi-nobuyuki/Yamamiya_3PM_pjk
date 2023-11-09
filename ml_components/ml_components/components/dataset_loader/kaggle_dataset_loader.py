@@ -15,7 +15,7 @@ from .template_dataset_loader import TemplateDatasetLoader
 
 
 class KaggleDatasetLoader(TemplateDatasetLoader):
-    def __init__(self, parameters: DatasetLoaderParameters, s3_io: S3ImageIO) -> None:
+    def __init__(selff, parameters: DatasetLoaderParameters, s3_io: S3ImageIO) -> None:
         print("Kaggle dataset loader")
         if isinstance(parameters, DatasetLoaderParameters):
             self.parameters = parameters

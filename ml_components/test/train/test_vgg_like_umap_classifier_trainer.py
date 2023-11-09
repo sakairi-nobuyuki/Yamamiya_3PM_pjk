@@ -1,22 +1,45 @@
 # coding: utf-8
 
-import os
 import glob
+import os
+from typing import Dict, List
+import cv2
+import json
 import numpy as np
 import pytest
-import cv2
 import torch
 import torchvision
 
-from ml_components.train import VggLikeUmapClassifierTrainer
-from ml_components.components.dataloader import BinaryClassifierDataloaderFactory
+from ml_components.components.dataset_loader import CustomDatasetLoader
 from ml_components.components.factory import IoModuleFactory
-from ml_components.components.inference import (
-    VggLikeUmapPredictor,
-    VggLikeFeatureExtractor,
-)
 from ml_components.models.factory import VggLikeClassifierFactory
+from ml_components.train import VggLikeUmapClassifierTrainer
+from ml_components.data_structures import DatasetLoaderParameters
 
+@pytest.fixture
+def mock_dataset() -> List[Dict[str, str]]:
+    dataset_parameters_dict = dict(
+        type="custom",
+        train_data_rate=0.7,
+        val_data_rate=0.2,
+        dataset_name="binary_classifier_test",
+        s3_dir="classifier/trainer_test",
+    )
+    
+    parameters = DatasetLoaderParameters(**dataset_parameters_dict)
+    io_factory = IoModuleFactory(
+        **dict(
+            endpoint_url=f"http://{os.environ['ENDPOINT_URL']}:9000",
+            access_key=os.environ["ACCESS_KEY"],
+            secret_key=os.environ["SECRET_KEY"],
+        )
+    )
+    image_s3 = io_factory.create(**dict(type="image", bucket_name="dataset"))
+
+    dataset_loader = CustomDatasetLoader(parameters, image_s3)
+    label_file_path_dict_list = dataset_loader.load()
+
+    return label_file_path_dict_list
 
 class TestVggLikeUmapClassifierTrainer:
     ### create mock model cofig
@@ -31,76 +54,54 @@ class TestVggLikeUmapClassifierTrainer:
         "train_loss": 0.9,
     }
 
-    io_factory = IoModuleFactory(**dict(
-        endpoint_url=f"http://{os.environ['ENDPOINT_URL']}:9000",
-        access_key=os.environ["ACCESS_KEY"],
-        secret_key=os.environ["SECRET_KEY"],
-    ))
+    io_factory = IoModuleFactory(
+        **dict(
+            endpoint_url=f"http://{os.environ['ENDPOINT_URL']}:9000",
+            access_key=os.environ["ACCESS_KEY"],
+            secret_key=os.environ["SECRET_KEY"],
+        )
+    )
     image_s3 = io_factory.create(**dict(type="image", bucket_name="dataset"))
 
-    def test_init(self) -> None:
+    def test_init(self, mock_dataset: List[Dict[str, str]]) -> None:
         ### create mock model
         torch.save(self.checkpoint, self.model_name)
 
         trainer = VggLikeUmapClassifierTrainer(
-            "classifier/train",
+            mock_dataset,
             VggLikeClassifierFactory(),
             self.io_factory.create(**dict(type="image", bucket_name="dataset")),
-            n_layer=-3
+            n_layer=-3,
         )
 
         assert isinstance(trainer, VggLikeUmapClassifierTrainer)
-        #assert isinstance(trainer.vgg.model, torchvision.models.vgg.VGG)
-        dataset_dict = trainer.configure_dataset("classifier", "train")
-        print(dataset_dict)
+        # assert isinstance(trainer.vgg.model, torchvision.models.vgg.VGG)
+        # dataset_dict = trainer.configure_dataset("classifier", "train")
+        # print(dataset_dict)
 
         os.remove(self.model_name)
 
-    @pytest.mark.skip("not now")
+    #    @pytest.mark.skip("not now")
     @pytest.mark.parametrize("n_layer", [-3, -1])
-    def test_various_layers(self, n_layer: int) -> None:
-        torch.save(self.checkpoint, self.model_name)
+    def test_various_layers(self, n_layer: int, mock_dataset: List[Dict[str, str]]) -> None:
+        # torch.save(self.checkpoint, self.model_name)
+        
 
-        extractor = VggLikeUmapClassifierTrainer(
-            self.model_name, self.factory, n_layer=n_layer
+        trainer = VggLikeUmapClassifierTrainer(
+            mock_dataset,
+            VggLikeClassifierFactory(),
+            self.image_s3,
+            n_layer=n_layer,
         )
 
-        assert isinstance(extractor, VggLikeUmapClassifierTrainer)
-        assert isinstance(extractor.vgg.model, torchvision.models.vgg.VGG)
+        assert isinstance(trainer, VggLikeUmapClassifierTrainer)
+        assert isinstance(trainer.vgg.model, torchvision.models.vgg.VGG)
 
-        this_file_path = os.path.dirname(os.path.abspath(__file__))
-        file_list = glob.glob(f"{this_file_path}/*png")
-        file_list = file_list + file_list + file_list + file_list + file_list + file_list
-        img_list = []
-        for file_path in file_list:
-            img = cv2.imread(file_path)
-            img_list.append(img)
-            assert isinstance(img, np.ndarray)
-        assert isinstance(img_list, list)
-        reduced_feat = extractor.fit(img_list)
+
+        reduced_feat = trainer.train()
 
         assert isinstance(reduced_feat, np.ndarray)
-        np.testing.assert_array_equal(reduced_feat.shape, (12, 2))
+        np.testing.assert_array_equal(reduced_feat.shape, (8, 2))
         print("reduced feat: ", reduced_feat)
-        os.remove(self.model_name)
-
-    @pytest.mark.skip("not now")
-    def test_calculate_d0_cluster_simplices(self)-> None:
-
-        input_1 = np.array([[0.0, 0.0], [1.0, -2.0], [2.0, 0.0], [1.0, -1.0]])
-        input_2 = np.array([[0.0, -1.0], [1.0, 2.0], [2.0, -1.0], [1.0, 1.0]])
-
-        torch.save(self.checkpoint, self.model_name)
-        extractor = VggLikeUmapClassifierTrainer(
-            self.model_name, self.factory, n_layer=-3
-        )
-        ch1 = extractor.get_convex_hull(input_1)
-        assert ch1.simplices.size == 3 * 2
-        for simplex in ch1.simplices:
-            print("simplex: ", simplex)
-            print(input_1[simplex, 0], input_1[simplex, 1])
-
-        print("convex hull 1 simplices:", ch1.simplices)
-        #extractor.calculate_d0_cluster_simplices(input_1, input_2)
-        #print(extractor.calculate_cluster_haussdorf_distance(input_1, input_2))
-        os.remove(self.model_name)
+        print("reduced feat shape: ", reduced_feat.shape)
+        print("reduced feat type: ", type(reduced_feat))
