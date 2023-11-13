@@ -66,7 +66,8 @@ COPY ./poetry.lock ${HOME}/app
 RUN poetry config virtualenvs.create false && \
     poetry config installer.parallel false && \
     poetry export -f requirements.txt --output requirements.txt --without-hashes && \
-    pip3 install -r requirements.txt --user --no-deps
+    pip3 install -r requirements.txt --user --no-deps && \
+    pip3 install umap-learn
 
 ### Copy kaggle token
 WORKDIR ${home}/.kaggle

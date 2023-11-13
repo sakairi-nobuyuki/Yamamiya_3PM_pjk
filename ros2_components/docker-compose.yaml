@@ -105,14 +105,18 @@ services:
       MINIO_ROOT_USER: sigma-chan
       MINIO_ROOT_PASSWORD: sigma-chan-dayo
     entrypoint: bash
-    command: -c "/opt/bin/minio server /export --address :9999 --console-address :9001;
+    #command: -c "/opt/bin/minio server /export --address :9999 --console-address :9001;
+    command: -c "/usr/bin/minio server /export --address :9999 --console-address :9001;
       mkdir -p /data/.minio.sys/buckets;
       cp -r /policies/* /data/.minio.sys/;
-      /usr/bin/minio server /data"j
+      /usr/bin/minio server /data"
     volumes:
-      - ./data:/export
-      - ./minio/policies:/policies
-      - ./minio/config:/root/.minio
+      - /mnt/d/data:/export
+      - /mnt/d/minio/policies:/policies
+      - /mnt/d/minio/config:/root/.minio
+#      - ./data:/export
+#      - ./minio/policies:/policies
+#      - ./minio/config:/root/.minio
     ports:
       - "9000:9999"
       - "9001:9001"
