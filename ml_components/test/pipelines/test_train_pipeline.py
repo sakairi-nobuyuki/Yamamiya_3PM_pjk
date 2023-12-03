@@ -1,7 +1,12 @@
 # coding: utf-8
 
 import json
+
 import numpy as np
+import umap
+from sklearn.linear_model import LogisticRegression
+import torchvision
+
 from ml_components.pipelines import TrainPipeline
 
 
@@ -23,6 +28,27 @@ class TestTrainPipeline:
         )
         parameters_str = json.dumps(train_parameters_dict)
         train_pipeline = TrainPipeline(parameters_str)
-        reduced_feat = train_pipeline.run()
+        label_map_dict = train_pipeline.trainer.get_label_map_dict()
+        assert isinstance(label_map_dict, dict)
+        assert len(label_map_dict) == 2
 
-        assert isinstance(reduced_feat, np.ndarray)
+        model_dir_path = train_pipeline.run()
+
+        assert isinstance(model_dir_path, str)
+
+        assert isinstance(train_pipeline.trainer.reducer.reducer, umap.UMAP)
+        assert isinstance(train_pipeline.trainer.reducer.regression, LogisticRegression)
+        assert isinstance(train_pipeline.trainer.vgg.model, torchvision.models.vgg.VGG)
+
+        s3_blob = train_pipeline.trainer.transfer_io.get_blob()
+
+        model_cand_items = [item for item in s3_blob if model_dir_path]
+
+        assert len(model_cand_items) >= 3
+        
+        model_cand_items_ext_list = [item.split(".")[-1] for item in model_cand_items]
+
+        assert "pickle" in model_cand_items_ext_list
+        assert "pth" in model_cand_items_ext_list
+        assert "yaml" in model_cand_items_ext_list
+

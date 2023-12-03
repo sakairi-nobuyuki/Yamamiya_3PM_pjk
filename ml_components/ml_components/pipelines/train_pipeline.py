@@ -18,6 +18,11 @@ from ..data_structures import TrainParameters
 
 
 class TrainPipeline:
+    """Train model
+    Tasks:
+    - Train model and create a model and a label list
+    """
+
     def __init__(self, parameters_str: str) -> None:
         """Initialize train pipeline.
         Tasks:
@@ -54,7 +59,7 @@ class TrainPipeline:
             self.dataset_loader.load()
 
             ### configure trainer
-            
+
             self.trainer = VggLikeClassifierTrainer(
                 self.parameters.dataset.s3_dir,
                 VggLikeClassifierFactory(),
@@ -71,15 +76,15 @@ class TrainPipeline:
             print(">> loading dataset")
             dataset_loader = CustomDatasetLoader(self.parameters.dataset, self.image_s3)
             label_file_path_dict_list = dataset_loader.load()
-            
+            print("label_file_path_dict_list: ", label_file_path_dict_list)
+
             self.trainer = VggLikeUmapClassifierTrainer(
                 label_file_path_dict_list,
                 VggLikeClassifierFactory(),
-                io_factory.create(**dict(type="image", bucket_name="dataset")),
+                io_factory,
                 n_layer=-3,
             )
 
     def run(self):
-
         ### train
-        self.trainer.train()
+        return self.trainer.train()

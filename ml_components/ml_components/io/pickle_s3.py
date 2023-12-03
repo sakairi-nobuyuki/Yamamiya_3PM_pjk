@@ -1,10 +1,12 @@
 # coding: utf-8
 import os
-import boto3
-from typing import List, Union, Any
 import pickle
+from typing import Any, List, Union
+
+import boto3
 
 from ml_components.io import IOTemplate
+
 
 class PickleIO(IOTemplate):
     def __init__(
@@ -61,19 +63,19 @@ class PickleIO(IOTemplate):
         Returns:
         np.ndarray: Loaded image.
         """
-        #obj = self.bucket.Object(key=key)
-        #response = obj.get()
+        # obj = self.bucket.Object(key=key)
+        # response = obj.get()
         temp_file_name = "temp.pickle"
 
         self.bucket.download_file(key, temp_file_name)
-#        with open(temp_file_name, 'wb') as f:
-            #self.s3.bucket.download_fileobj(self.bucket_name, key, f)
-#            self.s3.download_fileobj(self.bucket_name, key, f)
-            #self.bucket.download_file(self.bucket_name, key, f)
-            #self.bucket.download_file(self.bucket_name, key, f)
-            #self.bucket.download_file(key, file_name)
-        
-        with open(temp_file_name, 'rb') as f:
+        #        with open(temp_file_name, 'wb') as f:
+        # self.s3.bucket.download_fileobj(self.bucket_name, key, f)
+        #            self.s3.download_fileobj(self.bucket_name, key, f)
+        # self.bucket.download_file(self.bucket_name, key, f)
+        # self.bucket.download_file(self.bucket_name, key, f)
+        # self.bucket.download_file(key, file_name)
+
+        with open(temp_file_name, "rb") as f:
             my_pickle = pickle.load(f)
         os.remove(temp_file_name)
         return my_pickle

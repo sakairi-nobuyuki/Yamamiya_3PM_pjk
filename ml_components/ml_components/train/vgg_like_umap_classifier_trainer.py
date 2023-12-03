@@ -1,16 +1,21 @@
 # coding: utf-8
 
 import os
+from datetime import datetime
 from typing import Any, Dict, List
 
 import numpy as np
+import torch
+import torchvision.models as models
+import umap
+from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
 
-from ..components.dataloader import BinaryClassifierDataloaderFactory
+from ..components.factory import IoModuleFactory
 from ..components.dataset_loader import CustomDatasetLoader
 from ..components.inference import UmapReducingPredictor, VggLikeFeatureExtractor
 from ..data_structures import TrainParameters
-from ..io import IOTemplate, S3ImageIO
+from ..io import DataTransferS3, IOTemplate, S3ConfigIO
 from ..models.factory import ModelFactoryTemplate
 from . import TemplateTrainer
 
@@ -20,16 +25,37 @@ class VggLikeUmapClassifierTrainer(TemplateTrainer):
         self,
         data_path_list_dict: Dict[str, List[str]],
         factory: ModelFactoryTemplate,
-        image_io: S3ImageIO,
+        io_factory: IoModuleFactory,
         model_path: str = None,
+        save_model_path_base: str = None,
         n_layer: int = -1,
     ) -> None:
+        """Initialize trainer
+
+        Args:
+            data_path_list_dict (Dict[str, List[str]]): a list of dict of which key is data file path in the storage and value is its label.
+            factory (ModelFactoryTemplate): NN model factory. The model is used as a feature extractor.
+            image_io (DataTransferS3): IO component to load image faile
+            config_io (S3ConfigIO): IO component for save label
+            model_path (str, optional): model name. Defaults to None.
+            save_model_path_base (str, optional): model path to save. Defaults to None.
+            n_layer (int, optional): The number of NN layer to reduce when using as a feature extractor. Defaults to -1, -3 could be promissing.
+
+        Raises:
+            TypeError: factory, io things
+        """
         if not isinstance(factory, ModelFactoryTemplate):
             raise TypeError(f"{type(factory) is not {ModelFactoryTemplate}}")
+        if not isinstance(io_factory, IoModuleFactory):
+            raise TypeError(f"{io_factory} is not {IoModuleFactory}")
 
-        print("VggLikeUmapPredictorTrainer")
+        print("VggLikeUmapPredictor")
+
         self.data_path_dict_list = data_path_list_dict
-        self.image_io = image_io
+        self.label_map_dict = self.aggregate_label_map_dict(self.data_path_dict_list)
+        self.image_io = io_factory.create(**dict(type="image", bucket_name="dataset"))
+        self.config_io = io_factory.create(**dict(type="config", bucket_name="models"))
+        self.transfer_io = io_factory.create(**dict(type="transfer", bucket_name="models"))
         self.factory = factory
 
         # Train the model on your dataset using binary cross-entropy loss and SGD optimizer
@@ -41,10 +67,29 @@ class VggLikeUmapClassifierTrainer(TemplateTrainer):
             self.vgg = VggLikeFeatureExtractor(
                 self.factory, n_layer, model_path=model_path
             )
-        self.reducer = UmapReducingPredictor()
+        self.reducer = UmapReducingPredictor("train", s3=io_factory.create(**dict(type="pickle", bucket_name="models")))
 
+        if save_model_path_base is None:
+            self.save_model_path_base = f"classifier/vgg_umap/{self.__get_current_time()}"
+        else:
+            self.save_model_path_base = save_model_path_base
 
-    def train(self) -> np.ndarray:
+        print("data_path_dict_list: ", self.data_path_dict_list)
+        print(">> label map dict: ", self.label_map_dict)
+        label_map_dict_inverse = {v: k for k, v in self.label_map_dict.items()}
+
+        self.data_path_dict_list_int = [
+            {k: label_map_dict_inverse[v] for k, v in data_path_dict.items()}
+            for data_path_dict in self.data_path_dict_list
+            if len(data_path_dict) == 1
+        ]
+
+    # def train(self, image_list_dict: Dict[str, List[np.ndarray]]) -> Dict[str, Any]:
+    def train_all(self) -> np.ndarray:
+        return self.train(self.data_path_dict_list)
+
+    def train(self) -> str:
+        #    def train(self, data_path_dict_list: Dict[str, List[str]]) -> np.ndarray:
         """Train the UMAP parameter so that it will minimize the distance between clusters.
         - Create a list of combinations of two classes.
         - Calculate distances of each combinations.
@@ -56,32 +101,160 @@ class VggLikeUmapClassifierTrainer(TemplateTrainer):
         Returns:
             Dict[str, Any]: UMAP parameters
         """
-        data_path_dict_list = self.data_path_dict_list
-        
         # create a set of feature vectors and label list
         feat_list = []
         label_list = []
-        
-        print(">> Extracting feat vectors with VGG ")
-        with tqdm(
-            data_path_dict_list, total=len(data_path_dict_list)
-        ) as train_progress:
-            for item in train_progress:
-                input = self.image_io.load(list(item.keys())[0])
+
+        print(">> train start: ")
+        print(">> len self.data_path_dict_list_int: ", len(self.data_path_dict_list_int))
+        print(">> feature extraction ")
+
+        for train_progress in tqdm(self.data_path_dict_list_int):
+            for file_path, label in train_progress.items():
+                input = self.image_io.load(file_path)
                 feat = self.vgg.predict(input)
                 feat_list.append(feat)
-                label_list.append(list(item.values())[0])
+                label_list.append(label)
+        feat_array = np.concatenate(feat_list)
+        label_array = np.array(label_list)
+        print(type(feat_array), type(label_array))
+        print(">> UMAP fit ")
+        umap_model = self.reducer.fit_transform(feat_array, label_array)
+        print(">> UMAP feat: ", umap_model, type(umap_model[0]), type(umap_model[1]))
+        ## TODO: Save model and label.txt
+
+        self.save_ml_model(umap_model[0], umap_model[1])
+        self.save_nn_model(self.vgg.model)
+        self.save_labels(self.get_label_map_dict())
+
+        return self.save_model_path_base
+
+    def fit_all(
+        self, image_list_dict: Dict[str, List[np.ndarray]]
+    ) -> Dict[str, np.ndarray]:
+        return {
+            image_list_key: self.fit(image_list)
+            for image_list_key, image_list in image_list_dict.items()
+        }
+
+    def fit(self, image_list: List[np.ndarray]) -> np.ndarray:
+        """Fit the images of a cluster that is supervised to classes by human, and
+        fit by UMAP
+
+        Args:
+            image_list (List[np.ndarray]): A list of images of OpenCV
+
+        Returns:
+            np.ndarray: Fit and transformed result by UMAP
+        """
+
+        feat_list = [self.vgg.predict(image) for image in image_list]
         feat_array = np.concatenate(feat_list)
 
-        label_dict = {label: i_label for i_label, label in enumerate(list(set(label_list)))}
-        label_list_num = list(map(label_dict.get, label_list))
+        reduced_feat = self.reducer.predict(feat_array)
 
-        label_array = np.array(label_list_num)
-        print("feat list: ", feat_list, feat_array)
-        print("label list: ", label_list, label_array)
+        return reduced_feat
 
-        print(">> Obtaining reduced feat vectors with UMAP supervised")
-        umap_feat = self.reducer.reducer.fit_transform(feat_array, y=label_array)
+    def get_label_map_dict(self) -> Dict[int, str]:
+        """Get label map as a form of dict.
+        Let's say there are a set of data and its label in a dataset like,
+            file_1: label_1
+            file_2: label_2
+            file_3: label_1
+            ...
+        However the label itself is treated as integer, hence we should prepare a mapping from label in integer to
+        label in string like this.
 
-        return umap_feat
+        {
+            1: "label_1", 2: "label_2", ...
+        }
 
+        Returns:
+            Dict[int, str]: A dict to map integer to string
+        """
+        return self.label_map_dict
+
+    def aggregate_label_map_dict(self, data_path_dict_list) -> Dict[int, str]:
+        """Get label map as a form of dict.
+        Let's say there are a set of data and its label in a dataset like,
+            file_1: label_1
+            file_2: label_2
+            file_3: label_1
+            ...
+        However the label itself is treated as integer, hence we should prepare a mapping from label in integer to
+        label in string like this.
+
+        {
+            1: "label_1", 2: "label_2", ...
+        }
+
+        Returns:
+            Dict[int, str]: A dict to map integer to string
+        """
+        label_map_dict = {
+            i_label: label
+            for i_label, label in enumerate(
+                {
+                    str(list(data_path_dict.values())[0])
+                    for data_path_dict in data_path_dict_list
+                }
+            )
+        }
+
+        return label_map_dict
+
+    def save_ml_model(
+        self,
+        umap_model: umap.UMAP,
+        regression_model: LogisticRegression,
+        model_name: str = None,
+    ) -> str:
+        if model_name is None:
+            file_name = f"umap_model.pickle"
+        else:
+            file_name = model_name if "pickle" in model_name else f"{model_name}.pickle"
+
+        model_path = os.path.join(self.save_model_path_base, file_name)
+        self.reducer.save_models([umap_model, regression_model], model_path)
+
+        return model_path
+
+    def save_nn_model(self, model: models, model_name: str = None) -> str:
+        if model_name is None:
+            file_name = f"feature_extractor.pth"
+        else:
+            file_name = model_name if "pth" in model_name else f"{model_name}.pth"
+
+        checkpoint = {
+            "model_state_dict": model.state_dict(),
+            #"optimizer_state_dict": self.optimizer.state_dict(),
+        }
+        model_path = os.path.join(self.save_model_path_base, file_name)
+
+        if model_name is None:
+            file_name = f"feature_extractor.pth"
+        else:
+            file_name = model_name
+        torch.save(checkpoint, file_name)
+
+        self.transfer_io.save(file_name, model_path)
+
+        os.remove(file_name)
+
+        return model_path
+
+    def save_labels(self, label_dict: Dict[str, str], file_name: str = None):
+        if file_name is None:
+            file_name = f"labels.yaml"
+        else:
+            file_name = file_name if "yaml" in file_name else f"{file_name}.yaml"
+
+        label_path = os.path.join(self.save_model_path_base, file_name)
+        self.config_io.save(label_dict, label_path)
+
+        return label_path
+
+    def __get_current_time(self) -> str:
+        current_time = datetime.now().strftime("%Y%m%d%H%M%S")
+
+        return current_time

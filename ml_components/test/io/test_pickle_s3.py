@@ -2,7 +2,8 @@
 
 import pickle
 
-from ml_components.io import PickleIO, IOTemplate
+from ml_components.io import IOTemplate, PickleIO
+
 
 class TestPickleIO:
     def test_init(self):
@@ -30,4 +31,3 @@ class TestPickleIO:
 
         for file_content, loaded in zip(file_content_list, loaded_list):
             assert loaded == file_content
-

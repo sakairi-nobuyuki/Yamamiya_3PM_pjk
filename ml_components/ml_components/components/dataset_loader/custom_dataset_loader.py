@@ -23,7 +23,13 @@ class CustomDatasetLoader(TemplateDatasetLoader):
 
         self.is_dataset_in_the_storage()
 
-    def load(self):
+    def load(self) -> List[Dict[str, str]]:
+        """Load a dataset and return a list of dict whose format is "data_faile_path": "label"
+
+        Returns:
+            List[Dict[str, str]]: A list of dict of dataset data file path and its label.
+        """
+
         ### Get data path list of the target directory
         file_path_list = [
             file_path

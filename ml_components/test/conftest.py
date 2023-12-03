@@ -6,7 +6,7 @@ from typing import Any, Dict
 import pytest
 import torch
 
-from ml_components.io import OnnxS3, S3ImageIO
+from ml_components.io import OnnxS3, PickleIO, S3ImageIO
 
 # minio_endpoint_url="http://192.168.1.194:9000"
 minio_endpoint_url = f"http://{os.environ['ENDPOINT_URL']}:9000"
@@ -57,6 +57,16 @@ def mock_s3_dataset():
 @pytest.fixture
 def mock_s3_onnx():
     return OnnxS3(
+        endpoint_url=minio_endpoint_url,
+        access_key="sigma-chan",
+        secret_key="sigma-chan-dayo",
+        bucket_name="models",
+    )
+
+
+@pytest.fixture
+def mock_s3_pickle():
+    return PickleIO(
         endpoint_url=minio_endpoint_url,
         access_key="sigma-chan",
         secret_key="sigma-chan-dayo",
