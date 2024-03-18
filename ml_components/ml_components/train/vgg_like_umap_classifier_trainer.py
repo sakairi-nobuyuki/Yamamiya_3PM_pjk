@@ -12,10 +12,7 @@ from sklearn.linear_model import LogisticRegression
 from tqdm import tqdm
 
 from ..components.factory import IoModuleFactory
-from ..components.dataset_loader import CustomDatasetLoader
 from ..components.inference import UmapReducingPredictor, VggLikeFeatureExtractor
-from ..data_structures import TrainParameters
-from ..io import DataTransferS3, IOTemplate, S3ConfigIO
 from ..models.factory import ModelFactoryTemplate
 from . import TemplateTrainer
 
@@ -55,7 +52,9 @@ class VggLikeUmapClassifierTrainer(TemplateTrainer):
         self.label_map_dict = self.aggregate_label_map_dict(self.data_path_dict_list)
         self.image_io = io_factory.create(**dict(type="image", bucket_name="dataset"))
         self.config_io = io_factory.create(**dict(type="config", bucket_name="models"))
-        self.transfer_io = io_factory.create(**dict(type="transfer", bucket_name="models"))
+        self.transfer_io = io_factory.create(
+            **dict(type="transfer", bucket_name="models")
+        )
         self.factory = factory
 
         # Train the model on your dataset using binary cross-entropy loss and SGD optimizer
@@ -67,14 +66,17 @@ class VggLikeUmapClassifierTrainer(TemplateTrainer):
             self.vgg = VggLikeFeatureExtractor(
                 self.factory, n_layer, model_path=model_path
             )
-        self.reducer = UmapReducingPredictor("train", s3=io_factory.create(**dict(type="pickle", bucket_name="models")))
+        self.reducer = UmapReducingPredictor(
+            "train", s3=io_factory.create(**dict(type="pickle", bucket_name="models"))
+        )
 
+        # set model related things storage
         if save_model_path_base is None:
             self.save_model_path_base = f"classifier/vgg_umap/{self.__get_current_time()}"
         else:
             self.save_model_path_base = save_model_path_base
 
-        print("data_path_dict_list: ", self.data_path_dict_list)
+        print(">> part of data_path_dict_list: ", self.data_path_dict_list[:5])
         print(">> label map dict: ", self.label_map_dict)
         label_map_dict_inverse = {v: k for k, v in self.label_map_dict.items()}
 
@@ -84,12 +86,7 @@ class VggLikeUmapClassifierTrainer(TemplateTrainer):
             if len(data_path_dict) == 1
         ]
 
-    # def train(self, image_list_dict: Dict[str, List[np.ndarray]]) -> Dict[str, Any]:
-    def train_all(self) -> np.ndarray:
-        return self.train(self.data_path_dict_list)
-
     def train(self) -> str:
-        #    def train(self, data_path_dict_list: Dict[str, List[str]]) -> np.ndarray:
         """Train the UMAP parameter so that it will minimize the distance between clusters.
         - Create a list of combinations of two classes.
         - Calculate distances of each combinations.
@@ -121,39 +118,13 @@ class VggLikeUmapClassifierTrainer(TemplateTrainer):
         print(">> UMAP fit ")
         umap_model = self.reducer.fit_transform(feat_array, label_array)
         print(">> UMAP feat: ", umap_model, type(umap_model[0]), type(umap_model[1]))
-        ## TODO: Save model and label.txt
 
+        # save model and labels
         self.save_ml_model(umap_model[0], umap_model[1])
         self.save_nn_model(self.vgg.model)
         self.save_labels(self.get_label_map_dict())
 
         return self.save_model_path_base
-
-    def fit_all(
-        self, image_list_dict: Dict[str, List[np.ndarray]]
-    ) -> Dict[str, np.ndarray]:
-        return {
-            image_list_key: self.fit(image_list)
-            for image_list_key, image_list in image_list_dict.items()
-        }
-
-    def fit(self, image_list: List[np.ndarray]) -> np.ndarray:
-        """Fit the images of a cluster that is supervised to classes by human, and
-        fit by UMAP
-
-        Args:
-            image_list (List[np.ndarray]): A list of images of OpenCV
-
-        Returns:
-            np.ndarray: Fit and transformed result by UMAP
-        """
-
-        feat_list = [self.vgg.predict(image) for image in image_list]
-        feat_array = np.concatenate(feat_list)
-
-        reduced_feat = self.reducer.predict(feat_array)
-
-        return reduced_feat
 
     def get_label_map_dict(self) -> Dict[int, str]:
         """Get label map as a form of dict.
@@ -227,7 +198,7 @@ class VggLikeUmapClassifierTrainer(TemplateTrainer):
 
         checkpoint = {
             "model_state_dict": model.state_dict(),
-            #"optimizer_state_dict": self.optimizer.state_dict(),
+            # "optimizer_state_dict": self.optimizer.state_dict(),
         }
         model_path = os.path.join(self.save_model_path_base, file_name)
 

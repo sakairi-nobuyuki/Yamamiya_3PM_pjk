@@ -28,7 +28,7 @@ class UmapReducingPredictor(TemplatePredictor):
                 raise TypeError(f"{type(s3)} is not that of IOTemplate")
             else:
                 self.s3 = s3
-            self.reducer, self.regression = self.__load_models(model_path)
+            self.reducer, self.regression = self.load_models(model_path)
 
     def predict(self, input: np.ndarray) -> np.ndarray:
         """Predict a classifier task

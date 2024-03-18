@@ -59,7 +59,6 @@ class TrainPipeline:
             self.dataset_loader.load()
 
             ### configure trainer
-
             self.trainer = VggLikeClassifierTrainer(
                 self.parameters.dataset.s3_dir,
                 VggLikeClassifierFactory(),

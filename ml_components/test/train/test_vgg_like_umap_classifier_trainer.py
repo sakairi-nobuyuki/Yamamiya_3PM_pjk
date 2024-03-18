@@ -52,8 +52,8 @@ class TestVggLikeUmapClassifierTrainer:
                 {"fuga/guga/futa/fuga": "ok"},
             ],
             VggLikeClassifierFactory(),
-#            self.image_s3,
-#            self.config_s3,
+            #            self.image_s3,
+            #            self.config_s3,
             self.io_factory,
             n_layer=-3,
         )
@@ -78,8 +78,8 @@ class TestVggLikeUmapClassifierTrainer:
                 {"classifier_test/ok/fuga_32_0.png": "ok"},
             ],
             VggLikeClassifierFactory(),
-#            self.io_factory.create(**dict(type="image", bucket_name="dataset")),
-#            self.io_factory.create(**dict(type="config", bucket_name="models")),
+            #            self.io_factory.create(**dict(type="image", bucket_name="dataset")),
+            #            self.io_factory.create(**dict(type="config", bucket_name="models")),
             self.io_factory,
             n_layer=n_layer,
         )

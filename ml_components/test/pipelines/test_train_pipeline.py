@@ -3,9 +3,9 @@
 import json
 
 import numpy as np
+import torchvision
 import umap
 from sklearn.linear_model import LogisticRegression
-import torchvision
 
 from ml_components.pipelines import TrainPipeline
 
@@ -45,10 +45,9 @@ class TestTrainPipeline:
         model_cand_items = [item for item in s3_blob if model_dir_path]
 
         assert len(model_cand_items) >= 3
-        
+
         model_cand_items_ext_list = [item.split(".")[-1] for item in model_cand_items]
 
         assert "pickle" in model_cand_items_ext_list
         assert "pth" in model_cand_items_ext_list
         assert "yaml" in model_cand_items_ext_list
-

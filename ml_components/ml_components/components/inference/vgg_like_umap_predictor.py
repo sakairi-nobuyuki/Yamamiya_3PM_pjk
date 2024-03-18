@@ -19,7 +19,9 @@ class VggLikeUmapPredictor(TemplatePredictor):
         print("VggLikeUmapPredictor")
         print(">> model path: ", model_path)
         print(">> n layer: ", n_layer)
+        
         self.vgg = VggLikeFeatureExtractor(model_path, model_factory, n_layer)
+
         self.reducer = UmapReducingPredictor()
         self.label_dict = label_dict
 
