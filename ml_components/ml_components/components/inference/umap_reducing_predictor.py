@@ -71,6 +71,7 @@ class UmapReducingPredictor(TemplatePredictor):
             return self.reducer.fit_transform(feat_array)
 
     def load_models(self, model_path: str) -> List[Union[umap.UMAP, LogisticRegression]]:
+        print("downloading UMAP model from ", model_path)
         object_list = self.s3.load(model_path)
 
         if not isinstance(object_list[0], umap.UMAP):
@@ -81,7 +82,7 @@ class UmapReducingPredictor(TemplatePredictor):
             raise TypeError(
                 f"The second element of object_list must be LogisticRegresson: {type(object_list[1])}"
             )
-
+        print(f">> downloaded {len(object_list)} objs for UMAP ")
         return object_list
 
     def save_models(

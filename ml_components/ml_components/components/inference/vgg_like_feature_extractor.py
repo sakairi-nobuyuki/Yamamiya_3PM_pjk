@@ -46,7 +46,7 @@ class VggLikeFeatureExtractor(TemplatePredictor):
             checkpoint = torch.load(model_path)
             model_params = checkpoint["model_state_dict"]
             # Load the parameters to the model instance
-            self.model.load_state_dict(model_params)
+            self.model.load_state_dict(model_params, strict=False)
 
         # Set the model to evaluation mode
         self.model.eval()

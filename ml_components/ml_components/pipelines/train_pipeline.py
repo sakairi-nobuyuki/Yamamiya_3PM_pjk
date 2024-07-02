@@ -7,7 +7,6 @@ from typing import Dict
 from ml_components.components.dataloader import BinaryClassifierDataloaderFactory
 from ml_components.components.dataset_loader import (
     CustomDatasetLoader,
-    KaggleDatasetLoader,
 )
 from ml_components.components.factory import IoModuleFactory
 from ml_components.components.operators import load_train_parameters
@@ -52,11 +51,6 @@ class TrainPipeline:
             ### configure dataset loader
             print("VGG like classifier: ")
             print(">> loading dataset")
-            # TODO: in future dataset loader should be created with a factory
-            self.dataset_loader = KaggleDatasetLoader(
-                self.parameters.dataset, self.image_s3
-            )
-            self.dataset_loader.load()
 
             ### configure trainer
             self.trainer = VggLikeClassifierTrainer(

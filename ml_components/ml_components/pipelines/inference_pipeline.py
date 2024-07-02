@@ -69,6 +69,7 @@ class InferencePipeline:
                 print(">> classifier category: vgg umap")
                 print(">> model dir path: ", self.parameers.model_path)
 
+                ### download VGG model from cloud storage
                 vgg_model_path = os.path.join(
                     self.parameters.model_path, "feature_extractor.pth"
                 )

@@ -14,6 +14,7 @@ services:
   torch-python-base:
     build: 
       context: .
+      dockerfile: docker/poetry/Dockerfile
       target: torch-python-base
       args:
         - USER_NAME=${USER_NAME}
@@ -22,17 +23,18 @@ services:
         - GID=${GID}
     image: torch-python-base:latest
     container_name: torch-python-base
-  yamamiya-pm-ml:
+  yamamiya-pm-ml-poetry:
     build: 
       context: .
+      dockerfile: docker/poetry/Dockerfile
       target: yamamiya-pm-ml
       args:
         - USER_NAME=${USER_NAME}
         - GROUP_NAME=${GROUP_NAME}
         - UID=${UID}
         - GID=${GID}
-    image: nsakairi/yamamiya-pm-ml:latest
-    container_name: yamamiya-pm-ml
+    image: nsakairi/yamamiya-pm-ml-poetry:latest
+    container_name: yamamiya-pm-ml-poetry
 #    devices:
 #        - /dev/video0:/dev/video0
     environment:
@@ -54,26 +56,67 @@ services:
               count: 1
               capabilities: [gpu]
     tty: true
+  yamamiya-pm-ml-rye:
+    build: 
+      context: .
+      dockerfile: docker/rye/Dockerfile
+      target: yamamiya-pm-ml-rye
+      args:
+        - USER_NAME=${USER_NAME}
+        - GROUP_NAME=${GROUP_NAME}
+        - UID=${UID}
+        - GID=${GID}
+    image: nsakairi/yamamiya-pm-ml-rye:latest
+    container_name: yamamiya-pm-ml-rye
+#    devices:
+#        - /dev/video0:/dev/video0
+    environment:
+      - ENDPOINT_URL=${ENDPOINT_URL}
+      - MINIO_ENDPOINT_URL=http://${ENDPOINT_URL}:9000
+      - ACCESS_KEY=${ACCESS_KEY}
+      - SECRET_KEY=${SECRET_KEY}
+      - DISPLAY=${ENDPOINT_URL}:0
+#      - LIBGL_ALWAYS_INDIRECT=""
+    volumes:
+       - /tmp/.X11-unix:/tmp/.X11-unix
+       - $HOME/.Xauthority/:/root/.Xauthority
+       - ${WORKSPACE_DIR}:/home/${USER_NAME}/ml_components
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+#    tty: true
+
     # user: "${UID}:${GID}"
 #    ports:
 #      - "8000:8888"
 #      - "8001:8001"
   minio:
-    image: minio/minio:latest
+#    image: minio/minio:latest
+    image: minio/minio:RELEASE.2023-11-11T08-14-41Z
+#    image: minio/minio:RELEASE.2022-10-08T20-11-00Z
     container_name: minio
     environment:
       MINIO_ROOT_USER: sigma-chan
       MINIO_ROOT_PASSWORD: sigma-chan-dayo
     entrypoint: bash
-    #command: -c "/opt/bin/minio server /export --address :9999 --console-address :9001;
-    command: -c "/usr/bin/minio server /export --address :9999 --console-address :9001;
+#    command: -c "/opt/bin/minio server /export --address :9999 --console-address :9001;
+#    command: -c "/usr/bin/minio server /export --address :9999 --console-address :9001;    
+    command: -c "/usr/bin/minio server /export --address :9000 --console-address :9001;
       mkdir -p /data/.minio.sys/buckets;
       cp -r /policies/* /data/.minio.sys/;
       /usr/bin/minio server /data"
     volumes:
+#      - ./data:/export
+#      - ./minio/policies:/policies
+#      - ./minio/config:/root/.minio
       - /mnt/d/data:/export
       - /mnt/d/minio/policies:/policies
       - /mnt/d/minio/config:/root/.minio
     ports:
-      - "9000:9999"
+      - "9000:9000"
+#     - "9000:9999"
       - "9001:9001"
