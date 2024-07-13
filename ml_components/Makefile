@@ -9,7 +9,7 @@ format:
 	@for SRC in $(SRCS); do $(POETRY_PREFIX) isort $$SRC --profile black; done
 
 build-app:
-	docker-compose build --no-cache 
+	docker-compose build --no-cache yamamiya-pm-ml
 push-image:
 	docker tag $(CONTAINER_NAME):$(DEFAULT_TAG) $(REGISTORY_NAME)/$(CONTAINER_NAME):$(DEFAULT_TAG)
 	docker push $(REGISTORY_NAME)/$(CONTAINER_NAME):$(DEFAULT_TAG)
@@ -20,7 +20,7 @@ build-app-and-push:
 	docker push $(REGISTORY_NAME)/$(CONTAINER_NAME):$(DEFAULT_TAG)
 
 build-run-app:
-	docker-compose up -d --build app
+	docker-compose up -d --build yamamiya-pm-ml
 
 exec-up:
 	docker exec -it getter-robo 
