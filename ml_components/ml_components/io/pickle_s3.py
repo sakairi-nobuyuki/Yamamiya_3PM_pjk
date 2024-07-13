@@ -66,8 +66,8 @@ class PickleIO(IOTemplate):
         # obj = self.bucket.Object(key=key)
         # response = obj.get()
         temp_file_name = "temp.pickle"
-
         self.bucket.download_file(key, temp_file_name)
+        print("temp pickle file: ", os.path.exists(temp_file_name))
         #        with open(temp_file_name, 'wb') as f:
         # self.s3.bucket.download_fileobj(self.bucket_name, key, f)
         #            self.s3.download_fileobj(self.bucket_name, key, f)
@@ -92,7 +92,8 @@ class PickleIO(IOTemplate):
         """
         file_names = []
         for obj in self.bucket.objects.all():
-            if ".onnx" in str(obj.key):
+            if ".pickle" in str(obj.key) or ".pkl" in str(obj.key):
+#            if ".onnx" in str(obj.key):                
                 file_names.append(obj.key)
         return file_names
 

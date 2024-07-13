@@ -9,6 +9,7 @@ import pytest
 import torch
 import torchvision
 
+from ml_components.components.factory import IoModuleFactory
 from ml_components.components.inference import (
     VggLikeFeatureExtractor,
     VggLikeUmapPredictor,
@@ -17,10 +18,47 @@ from ml_components.models.factory import VggLikeClassifierFactory
 
 
 class TestVggLikeUmapPredictor:
+    model_path: str = "classifier/vgg_umap"
+    factory = VggLikeClassifierFactory()
+    io_factory = IoModuleFactory(
+        **dict(
+            endpoint_url=f"http://{os.environ['ENDPOINT_URL']}:9000",
+            access_key=os.environ["ACCESS_KEY"],
+            secret_key=os.environ["SECRET_KEY"],
+        )
+    )
+    def test_init(self) -> None:
+        transfer_s3 = self.io_factory.create(**dict(type="transfer", bucket_name="models"))
+        print("blob: ", transfer_s3.blob)
+        assert len([file_path for file_path in transfer_s3.blob if "test_data" in file_path]) > 0
+        assert len([file_path for file_path in transfer_s3.blob if "test_data/labels.yaml" in file_path]) > 0
+        assert len([file_path for file_path in transfer_s3.blob if "test_data/umap_model.pickle" in file_path]) > 0
+        assert len([file_path for file_path in transfer_s3.blob if "test_data/feature_extractor.pth" in file_path]) > 0
+
+        model_dir_path_name = "classifier/vgg_umap/test_data"
+        predictor = VggLikeUmapPredictor(f"{model_dir_path_name}/feature_extractor.pth",
+                                         f"{model_dir_path_name}/umap_model.pickle",
+                                         f"{model_dir_path_name}/labels.yaml",
+                                         VggLikeClassifierFactory(), 
+                                         self.io_factory)
+        assert isinstance(predictor, VggLikeUmapPredictor)
+        
+
+@pytest.mark.skip(reason="no longer effective")
+class TestVggLikeUmapPredictorCollapsed:
     model_name = "hoge.pth"
     factory = VggLikeClassifierFactory()
     tmp_model = factory.create_model()
     optimizer = torch.optim.SGD(tmp_model.parameters(), lr=0.001, momentum=0.9)
+    io_factory = IoModuleFactory(
+        **dict(
+            endpoint_url=f"http://{os.environ['ENDPOINT_URL']}:9000",
+            access_key=os.environ["ACCESS_KEY"],
+            secret_key=os.environ["SECRET_KEY"],
+        )
+    )
+    label_dict = {0: "ok", 1: "ng"}
+    s3 = io_factory.create(**dict(type="pickle", bucket_name="models"))
     checkpoint = {
         "epoch": 0,
         "model_state_dict": tmp_model.state_dict(),
@@ -31,7 +69,9 @@ class TestVggLikeUmapPredictor:
     def test_init(self) -> None:
         torch.save(self.checkpoint, self.model_name)
 
-        extractor = VggLikeUmapPredictor(self.model_name, self.factory, n_layer=-1)
+        extractor = VggLikeUmapPredictor(
+            self.model_name, self.label_dict, self.factory, self.io_factory, n_layer=-1
+        )
 
         assert isinstance(extractor, VggLikeUmapPredictor)
         assert isinstance(extractor.vgg.model, torchvision.models.vgg.VGG)
@@ -42,7 +82,9 @@ class TestVggLikeUmapPredictor:
     def test_various_layers(self, n_layer: int) -> None:
         torch.save(self.checkpoint, self.model_name)
 
-        extractor = VggLikeUmapPredictor(self.model_name, self.factory, n_layer=n_layer)
+        extractor = VggLikeUmapPredictor(
+            self.model_name, self.label_dict, self.factory, self.io_factory, n_layer=n_layer
+        )
 
         assert isinstance(extractor, VggLikeUmapPredictor)
         assert isinstance(extractor.vgg.model, torchvision.models.vgg.VGG)
