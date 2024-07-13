@@ -37,26 +37,9 @@ allow-direct-references = true
 packages = ["src/ml_components"]
 
 
-[tool.black]
-line-length = 90
-exclude = '''
-(
-     \.eggs
-    | \.git
-    | \.hg
-    | \.mypy_cache
-    | \.tox
-    | venv
-    | \.idea
-    | \.vscode
-    | _build
-    | buck-out
-    | build
-    | dist
-    | migrations
-    | db
- )
- '''
+[tool.rye]
+managed = true
+dev-dependencies = []
 
 [tool.isort]
 profile = "black"
