@@ -72,20 +72,50 @@ class TemplateDatasetLoader(metaclass=ABCMeta):
         print(
             f">>   {class_name}: {len(file_list)}, {class_name} train: {len(train_file_list)}, {class_name} val: {len(val_file_list)}"
         )
-        #        assert abs(len(file_list) - len(train_file_list) - len(val_file_list)) > 2
-        #        assert (
-        #            len(
-        #                [
-        #                    file_path
-        #                    for file_path in train_file_list
-        #                    if class_name not in file_path
-        #                ]
-        #            )
-        #            == 0
-        #        )
-        #        assert (
-        #            len([file_path for file_path in val_file_list if class_name not in file_path])
-        #            == 0
-        #        )
 
         return dict(train=train_file_list, val=val_file_list, test=test_file_list)
+
+    def is_dataset_in_the_storage(self) -> bool:
+        ### If in the case of classifier
+
+        ### if the subject dataset is in the storage
+        print(f">>   If {self.parameters.s3_dir} is in the storage")
+        if len(list(filter(lambda x: self.parameters.s3_dir in x, self.s3_io.blob))) == 0:
+            print(f">>   {self.parameters.s3_dir} was not found in the storage")
+            return False
+
+        ### if train and validation is sufficient
+        print(
+            f">>   Train and val dataset size: {len(list(map(lambda x: 'train' in x or 'validation' in x, self.s3_io.blob)))}"
+        )
+        if (len(list(filter(lambda x: "train" in x, self.s3_io.blob))) < 1) or (
+            len(list(filter(lambda x: "validation" in x, self.s3_io.blob))) < 1
+        ):
+            print(
+                f">>   Too few dataset: {len(list(map(lambda x: 'train' in x or 'validation' in x, self.s3_io.blob)))}"
+            )
+            return False
+
+        ### if the number of classes is sufficient
+        if len(set(list(map(lambda x: x.split("/")[-2], self.s3_io.blob)))) < 1:
+            print(
+                f">>  the length of the classes is too small: {len(set(list(map(lambda x: x.split('/')[-2], self.s3_io.blob))))}"
+            )
+            return False
+
+        return True
+
+    def get_label_list(self) -> List[str]:
+        """Get label list in the storage
+
+        Returns:
+            List[str]: Label list
+        """
+
+        file_path_list = filter(lambda x: self.parameters.s3_dir in x, self.s3_io.blob)
+        print(file_path_list)
+        label_list = sorted(
+            list(set([file_path.split("/")[-2] for file_path in file_path_list]))
+        )
+
+        return label_list

@@ -1,16 +1,16 @@
 # coding: utf-8
 
 import os
-
 from typing import Dict
-import yaml
+
 import numpy as np
+import yaml
 
 from ..components.dataset_loader import KaggleDatasetLoader
 from ..components.factory import IoModuleFactory
-from ..data_structures import AccuracyMeasurementParameters
 from ..components.inference import InferenceContext, VggLikeClassifierPredictor
-from ..models.factory import VggLikeClassifierFactory, ModelFactoryTemplate
+from ..data_structures import AccuracyMeasurementParameters
+from ..models.factory import ModelFactoryTemplate, VggLikeClassifierFactory
 from . import TemplatePipeline
 
 
@@ -63,14 +63,17 @@ class AccuracyMeasPipeline(TemplatePipeline):
 
         ### create correct data list in a list of dicts [{"file_path": str, "correct_data": str}, ...]
         if self.parameters.type == "classification":
-            
             label_list = self.dataset_loader.get_label_list()
             file_path_list = self.img_io.get_blob()
             self.label_dict = {i_label: label for i_label, label in enumerate(label_list)}
             print(f">> creating data list dict for {label_list}")
             self.file_list_dict = {
-                #label: [label for label in label_list if label.split("/") is label]
-                label: [file_path for file_path in file_path_list if label in file_path and "test" in file_path]
+                # label: [label for label in label_list if label.split("/") is label]
+                label: [
+                    file_path
+                    for file_path in file_path_list
+                    if label in file_path and "test" in file_path
+                ]
                 for label in label_list
             }
             print(f">> file list dict: {self.file_list_dict}")
@@ -83,20 +86,20 @@ class AccuracyMeasPipeline(TemplatePipeline):
     def construct_predictor(self, model_path: str, factory: ModelFactoryTemplate):
         if not isinstance(factory, ModelFactoryTemplate):
             raise NotImplementedError(f"{factory} is not implemented")
-        
+
         ### download model
         local_model_path = self.model_trans_io.load(model_path)["file_name"]
 
         ### create predictor
-        predictor = InferenceContext(VggLikeClassifierPredictor(local_model_path, factory))
-        
+        predictor = InferenceContext(
+            VggLikeClassifierPredictor(local_model_path, factory)
+        )
+
         os.remove(local_model_path)
 
         return predictor
 
-
     def run(self):
-
         print("Run the accuracy measurement")
         res_list = []
         correct_list = []
@@ -107,22 +110,28 @@ class AccuracyMeasPipeline(TemplatePipeline):
             predictor = self.construct_predictor(model_path, self.model_factory)
 
             for label, file_path_list in self.file_list_dict.items():
-                i_correct_label = [i_label_ref for i_label_ref, label_ref in self.label_dict.items() if label == label_ref][0]
+                i_correct_label = [
+                    i_label_ref
+                    for i_label_ref, label_ref in self.label_dict.items()
+                    if label == label_ref
+                ][0]
                 print(label, i_correct_label)
                 for file_path in file_path_list:
                     img = self.img_io.load(file_path)
                     res = predictor.run(img)
-                    #print(f"{file_path}: {res}")
+                    # print(f"{file_path}: {res}")
                     correct_list.append(i_correct_label)
                     res_list.append(res)
-                    
+
             confusion_matrix = np.zeros((n_classes, n_classes), dtype=int)
             classes = np.unique(correct_list)
             for i in range(n_classes):
                 for j in range(n_classes):
-                    confusion_matrix[i, j] = np.sum((correct_list == classes[i]) & (res_list == classes[j]))
+                    confusion_matrix[i, j] = np.sum(
+                        (correct_list == classes[i]) & (res_list == classes[j])
+                    )
             print(">> confusion matrix: ", confusion_matrix)
-                    
+
             tp = confusion_matrix[0][0]
             tn = confusion_matrix[1][1]
             fp = confusion_matrix[1][0]
@@ -133,5 +142,6 @@ class AccuracyMeasPipeline(TemplatePipeline):
             recall = tp / float(tp + fn)
             f1_score = 2 * (precision * recall) / (precision + recall)
 
-            print(f">> precision: {precision}, accuracy: {accuracy}, f1: {f1_score}, recall: {recall}")
-                    
+            print(
+                f">> precision: {precision}, accuracy: {accuracy}, f1: {f1_score}, recall: {recall}"
+            )

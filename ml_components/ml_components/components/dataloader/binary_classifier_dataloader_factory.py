@@ -21,7 +21,13 @@ class BinaryClassifierDataloaderFactory:
         )
         self.s3 = s3
 
-    def create(self, data_path: str) -> ClassifierDataloaderDataclass:
+    def create(
+        self,
+        data_path: str,
+        batch_size: int = 64,
+        shuffle_train: bool = True,
+        shuffle_val=False,
+    ) -> ClassifierDataloaderDataclass:
         """Create Dataloader Dataclass from a dataset stored in a local storage.
 
         Args:
@@ -45,10 +51,10 @@ class BinaryClassifierDataloaderFactory:
 
         # Wrap datasets with DataLoader class
         train_loader = torch.utils.data.DataLoader(
-            train_dataset, batch_size=64, shuffle=True
+            train_dataset, batch_size=batch_size, shuffle=shuffle_train
         )
         val_loader = torch.utils.data.DataLoader(
-            val_dataset, batch_size=64, shuffle=False
+            val_dataset, batch_size=batch_size, shuffle=shuffle_val
         )
 
         # self.s3.delete_local(data_path)

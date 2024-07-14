@@ -142,6 +142,9 @@ class VggLikeClassifierTrainer(TemplateTrainer):
 
         return {"file_name": file_name, "train_loss": train_loss, "val_loss": val_loss}
 
+    def get_label_map_dict(self) -> Dict[int, str]:
+        pass
+
 
 def main():
     """Production code should be implemented here for simplicity"""

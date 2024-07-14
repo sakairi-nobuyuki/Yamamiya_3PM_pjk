@@ -1,5 +1,5 @@
 FROM pytorch/pytorch:latest as torch-base
-# FROM pytorch/pytorch:1.9.0-cuda11.1-cudnn8-runtime as torch-base
+    # FROM pytorch/pytorch:1.9.0-cuda11.1-cudnn8-runtime as torch-base
 # FROM nvidia/cuda:11.7.0-cudnn8-devel-ubuntu22.04 as cuda-cudnn-base
 
 # setting Timezone, Launguage
@@ -42,8 +42,18 @@ RUN sudo apt update && \
 RUN pip install --upgrade pip
 
 ### Install poetry
-RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=$POETRY_VERSION python -
-RUN echo ${USER_NAME} && echo ${HOME} && ls -la && pwd
+
+# RUN curl -sSL https://install.python-poetry.org | POETRY_VERSION=$POETRY_VERSION python -
+# RUN echo ${USER_NAME} && echo ${HOME} && ls -la && pwd
+
+### Install rye
+# ENV PYTHONDONTWRITEBYTECODE=1
+# ENV RYE_HOME="/opt/rye"
+
+# RUN curl -sSf https://rye-up.com/get | RYE_NO_AUTO_INSTALL=1 RYE_INSTALL_OPTION="--yes" sudo bash
+# RUN curl -sSf https://rye-up.com/get | RYE_INSTALL_OPTION="--yes" bash
+# ENV PATH="$RYE_HOME/shims:$PATH"
+
 
 ### install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
@@ -59,19 +69,21 @@ ARG USER_NAME=${USER_NAME}
 ENV HOME=/home/${USER_NAME}
 USER ${USER_NAME}
 WORKDIR ${HOME}/app
-COPY ./pyproject.toml ${HOME}/app 
-COPY ./poetry.lock ${HOME}/app
+#COPY ./pyproject.toml ${HOME}/app 
+#COPY ./poetry.lock ${HOME}/app
 
 ### install python dependencies
-RUN poetry config virtualenvs.create false && \
-    poetry config installer.parallel false && \
-    poetry export -f requirements.txt --output requirements.txt --without-hashes && \
-    pip3 install -r requirements.txt --user --no-deps
+#RUN poetry config virtualenvs.create false && \
+#    poetry config installer.parallel false && \
+#    poetry export -f requirements.txt --output requirements.txt --without-hashes && \
+#    pip3 install -r requirements.txt --user --no-deps && \
+#    pip3 install umap-learn
 
 ### Copy kaggle token
-WORKDIR ${home}/.kaggle
-COPY kaggle.json ${home}/.kaggle/kaggle.json
-RUN sudo chmod 600 ${home}/.kaggle/kaggle.json
+## WORKDIR ${home}/.kaggle
+# COPY kaggle.json ${home}/.kaggle/kaggle.json
+# RUN sudo chmod 600 ${home}/.kaggle/kaggle.json
+WORKDIR ${home}
 
 CMD ["/bin/bash"]
 

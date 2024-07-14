@@ -4,7 +4,14 @@ import os
 from typing import Any, Dict, List
 
 from ml_components.components.factory import TemplateFactory
-from ml_components.io import DataTransferS3, IOTemplate, OnnxS3, S3ConfigIO, S3ImageIO
+from ml_components.io import (
+    DataTransferS3,
+    IOTemplate,
+    OnnxS3,
+    PickleIO,
+    S3ConfigIO,
+    S3ImageIO,
+)
 
 
 class IoModuleFactory(TemplateFactory):
@@ -80,5 +87,16 @@ class IoModuleFactory(TemplateFactory):
             return DataTransferS3(
                 self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
             )
+        elif kwargs["type"] == "pickle":
+            print(
+                ">> create pickle s3: ",
+                self.endpoint_url,
+                self.access_key,
+                self.secret_key,
+            )
+            return PickleIO(
+                self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
+            )
+
         else:
             raise NotImplementedError(f"{kwargs['type']} is not implemented")

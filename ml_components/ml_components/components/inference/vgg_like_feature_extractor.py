@@ -5,45 +5,59 @@ import os
 import numpy as np
 import torch
 import torchvision
-import torchvision.models as models
+from torchvision.models.feature_extraction import create_feature_extractor
 
 from ...models.factory import ModelFactoryTemplate
 from .template_predictor import TemplatePredictor
 
 
-class VggLikeClassifierPredictor(TemplatePredictor):
-    def __init__(self, model_path: str, model_factory: ModelFactoryTemplate) -> None:
+class VggLikeFeatureExtractor(TemplatePredictor):
+    def __init__(
+        self,
+        model_factory: ModelFactoryTemplate,
+        n_layer: int = -1,
+        model_path: str = None,
+    ) -> None:
         """Initialize predictor.
         - load model
 
         Args:
-            model_path (str): _description_
-            model_factory (ModelFactoryTemplate): _description_
+            model_path (str): Model path
+            model_factory (ModelFactoryTemplate): Model factory instance
+            n_layer (int): The position of a layer to extract feature vector
 
         Raises:
             TypeError: _description_
             FileNotFoundError: _description_
         """
+        print("Configuring a feature extractor")
         ### download and load the model, finally delete it.
-
         if not isinstance(model_factory, ModelFactoryTemplate):
             raise TypeError(f"{model_factory} model is not that of ModelFactoryTemplate")
-        if not os.path.exists(model_path):
-            raise FileNotFoundError(f"{model_path} is not found.")
-
-        checkpoint = torch.load(model_path)
-
-        # Extract the model parameters
-        model_params = checkpoint["model_state_dict"]
 
         # Create a model instance with factory
         self.model = model_factory.create_model()
 
-        # Load the parameters to the model instance
-        self.model.load_state_dict(model_params)
+        if model_path is not None:
+            if not os.path.exists(model_path):
+                raise FileNotFoundError(f"{model_path} is not found.")
+
+            # Extract the model parameters
+            checkpoint = torch.load(model_path)
+            model_params = checkpoint["model_state_dict"]
+            # Load the parameters to the model instance
+            self.model.load_state_dict(model_params, strict=False)
 
         # Set the model to evaluation mode
         self.model.eval()
+
+        self.feature_extractor = self.model
+        for i_layer in range(n_layer, 0):
+            print(f">> configuring {i_layer}th layer to be an identity mapping.")
+            self.feature_extractor.classifier[i_layer] = torch.nn.Identity()
+            # self.feature_extractor.classifier[-i_layer] = torch.nn.Identity()
+        self.feature_extractor.classifier[n_layer] = torch.nn.Identity()
+        print(">> feat extractor configuration: ", self.feature_extractor)
 
         self.prediction_transform = torchvision.transforms.Compose(
             [
@@ -75,12 +89,7 @@ class VggLikeClassifierPredictor(TemplatePredictor):
         input = input.unsqueeze(0)
 
         # Make a prediction with the model
-        output = self.model(input)
+        output = self.feature_extractor(input).detach().numpy()
 
-        # Convert the output to a class label
-        # For example, use the maximum score as the predicted class
-        _, predicted = torch.max(output.data, 1)
-
-        #        print('Predicted class:', predicted.item())
-
-        return predicted.item()
+        return output
+        # return predicted.item()

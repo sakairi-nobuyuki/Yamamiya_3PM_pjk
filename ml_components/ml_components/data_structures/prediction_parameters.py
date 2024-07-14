@@ -28,3 +28,4 @@ class PredictionParameters(BaseModel):
     base_model: Optional[str] = None
     category: str = "dnn"
     type: str = "binary"
+    feature_reducer_path: Optional[str] = None
