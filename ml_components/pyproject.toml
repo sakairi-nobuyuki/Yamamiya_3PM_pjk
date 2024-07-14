@@ -3,8 +3,6 @@ name = "ml-components"
 version = "0.1.0"
 description = "Add your description here"
 dependencies = [
-    "opencv-python>=4.10.0.84",
-    "numpy>=2.0.0",
     "typer>=0.12.3",
     "black>=24.4.2",
     "isort>=5.13.2",
@@ -13,11 +11,13 @@ dependencies = [
     "tqdm>=4.66.4",
     "pydantic>=2.8.0",
     "scikit-learn>=1.5.0",
-    "torch>=2.3.1",
-    "torch-vision>=0.1.6.dev0",
     "pyyaml>=6.0.1",
     "pillow>=10.4.0",
     "umap-learn>=0.5.6",
+    "torch-vision>=0.1.6.dev0",
+    "torchvision==0.17",
+    "numpy<2.0",
+    "opencv-python<4.8",
 ]
 readme = "README.md"
 requires-python = ">= 3.12"
@@ -26,9 +26,9 @@ requires-python = ">= 3.12"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.rye]
-managed = true
-dev-dependencies = []
+#[tool.rye]
+#managed = true
+#dev-dependencies = []
 
 [tool.hatch.metadata]
 allow-direct-references = true
