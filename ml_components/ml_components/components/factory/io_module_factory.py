@@ -52,10 +52,16 @@ class IoModuleFactory(TemplateFactory):
         """
         if kwargs["type"] == "onnx":
             print(
-                ">> create onnx s3: ", self.endpoint_url, self.access_key, self.secret_key
+                ">> create onnx s3: ",
+                self.endpoint_url,
+                self.access_key,
+                self.secret_key,
             )
             return OnnxS3(
-                self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
+                self.endpoint_url,
+                self.access_key,
+                self.secret_key,
+                kwargs["bucket_name"],
             )
         elif kwargs["type"] == "image":
             print(
@@ -65,7 +71,10 @@ class IoModuleFactory(TemplateFactory):
                 self.secret_key,
             )
             return S3ImageIO(
-                self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
+                self.endpoint_url,
+                self.access_key,
+                self.secret_key,
+                kwargs["bucket_name"],
             )
         elif kwargs["type"] == "config":
             print(
@@ -75,7 +84,10 @@ class IoModuleFactory(TemplateFactory):
                 self.secret_key,
             )
             return S3ConfigIO(
-                self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
+                self.endpoint_url,
+                self.access_key,
+                self.secret_key,
+                kwargs["bucket_name"],
             )
         elif kwargs["type"] == "transfer":
             print(
@@ -85,7 +97,10 @@ class IoModuleFactory(TemplateFactory):
                 self.secret_key,
             )
             return DataTransferS3(
-                self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
+                self.endpoint_url,
+                self.access_key,
+                self.secret_key,
+                kwargs["bucket_name"],
             )
         elif kwargs["type"] == "pickle":
             print(
@@ -95,7 +110,10 @@ class IoModuleFactory(TemplateFactory):
                 self.secret_key,
             )
             return PickleIO(
-                self.endpoint_url, self.access_key, self.secret_key, kwargs["bucket_name"]
+                self.endpoint_url,
+                self.access_key,
+                self.secret_key,
+                kwargs["bucket_name"],
             )
 
         else:

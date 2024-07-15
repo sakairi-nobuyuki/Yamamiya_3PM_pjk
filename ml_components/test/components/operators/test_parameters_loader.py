@@ -4,10 +4,7 @@ from typing import Any, Dict
 
 from ml_components.components.factory import IoModuleFactory
 from ml_components.components.operators import load_train_parameters
-from ml_components.data_structures import (
-    DatasetLoaderParameters,
-    TrainParameters,
-)
+from ml_components.data_structures import DatasetLoaderParameters, TrainParameters
 from ml_components.io import S3ConfigIO
 
 

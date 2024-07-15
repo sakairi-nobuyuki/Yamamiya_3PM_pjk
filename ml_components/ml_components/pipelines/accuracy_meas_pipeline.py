@@ -38,7 +38,9 @@ class AccuracyMeasPipeline(TemplatePipeline):
         """
 
         ### load parameters
-        self.parameters = AccuracyMeasurementParameters(**yaml.safe_load(parameters_str))
+        self.parameters = AccuracyMeasurementParameters(
+            **yaml.safe_load(parameters_str)
+        )
 
         io_factory = IoModuleFactory()
         self.config_io = io_factory.create(**dict(type="config", bucket_name="config"))
@@ -65,7 +67,9 @@ class AccuracyMeasPipeline(TemplatePipeline):
         if self.parameters.type == "classification":
             label_list = self.dataset_loader.get_label_list()
             file_path_list = self.img_io.get_blob()
-            self.label_dict = {i_label: label for i_label, label in enumerate(label_list)}
+            self.label_dict = {
+                i_label: label for i_label, label in enumerate(label_list)
+            }
             print(f">> creating data list dict for {label_list}")
             self.file_list_dict = {
                 # label: [label for label in label_list if label.split("/") is label]

@@ -20,7 +20,9 @@ def load_train_parameters(yaml_path: str, config_s3: S3ConfigIO) -> TrainParamet
     """
 
     if yaml_path not in config_s3.blob:
-        raise FileNotFoundError(f"{yaml_path} is not found for loading train parameters.")
+        raise FileNotFoundError(
+            f"{yaml_path} is not found for loading train parameters."
+        )
 
     parameters_dict = config_s3.load(yaml_path)
 
@@ -41,7 +43,9 @@ def load_accuracy_meas_parameters(
     """
 
     if yaml_path not in config_s3.blob:
-        raise FileNotFoundError(f"{yaml_path} is not found for loading train parameters.")
+        raise FileNotFoundError(
+            f"{yaml_path} is not found for loading train parameters."
+        )
 
     parameters_dict = config_s3.load(yaml_path)
 

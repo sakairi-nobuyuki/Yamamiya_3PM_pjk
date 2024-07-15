@@ -53,7 +53,9 @@ class VggLikeClassifierTrainer(TemplateTrainer):
         self.dataloader = dataloader_factory.create(data_path)
         # Train the model on your dataset using binary cross-entropy loss and SGD optimizer
         self.criterion = nn.CrossEntropyLoss()
-        self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001, momentum=0.9)
+        self.optimizer = torch.optim.SGD(
+            self.model.parameters(), lr=0.001, momentum=0.9
+        )
 
     def train(self):
         # Train the model for some number of epochs
@@ -69,9 +71,13 @@ class VggLikeClassifierTrainer(TemplateTrainer):
                 self.model, self.dataloader.validation_loader
             )
             if epoch == 0:
-                summary = self.save_model(epoch, self.model, train_loss, validation_loss)
+                summary = self.save_model(
+                    epoch, self.model, train_loss, validation_loss
+                )
             elif validation_loss_list[-1] > validation_loss:
-                summary = self.save_model(epoch, self.model, train_loss, validation_loss)
+                summary = self.save_model(
+                    epoch, self.model, train_loss, validation_loss
+                )
             validation_loss_list.append(validation_loss)
             summary_list.append(summary)
             print(f">> validation loss: {validation_loss}")
@@ -79,13 +85,17 @@ class VggLikeClassifierTrainer(TemplateTrainer):
         print("validation loss history: ", validation_loss_list)
         val_loss_list = [item["val_loss"] for item in summary_list]
         min_val_loss_index = validation_loss_list.index(min(val_loss_list))
-        print("minimum val loss: ", min_val_loss_index, val_loss_list[min_val_loss_index])
+        print(
+            "minimum val loss: ", min_val_loss_index, val_loss_list[min_val_loss_index]
+        )
         file_name = [item["file_name"] for item in summary_list][min_val_loss_index]
         print("File name to upload: ", file_name)
         self.io.save(file_name, f"binary_classifier/vgg_base/{file_name}")
         map(shutil.rmtree, [item for item in summary_list["file_name"]])
 
-    def iterate_train(self, model: Any, dataloader: torch.utils.data.DataLoader) -> float:
+    def iterate_train(
+        self, model: Any, dataloader: torch.utils.data.DataLoader
+    ) -> float:
         model.train()
         train_loss = 0.0
 

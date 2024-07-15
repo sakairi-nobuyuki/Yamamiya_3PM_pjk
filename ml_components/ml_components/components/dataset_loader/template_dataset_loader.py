@@ -53,7 +53,11 @@ class TemplateDatasetLoader(metaclass=ABCMeta):
             + int(file_list_length * self.parameters.val_data_rate) * ["validation"]
             + int(
                 file_list_length
-                * (1.0 - self.parameters.train_data_rate - self.parameters.val_data_rate)
+                * (
+                    1.0
+                    - self.parameters.train_data_rate
+                    - self.parameters.val_data_rate
+                )
             )
             * ["test"]
         )
@@ -63,7 +67,9 @@ class TemplateDatasetLoader(metaclass=ABCMeta):
             item for (flag, item) in zip(template_list, file_list) if flag == "train"
         ]
         val_file_list = [
-            item for (flag, item) in zip(template_list, file_list) if flag == "validation"
+            item
+            for (flag, item) in zip(template_list, file_list)
+            if flag == "validation"
         ]
         test_file_list = [
             item for (flag, item) in zip(template_list, file_list) if flag == "test"
@@ -80,7 +86,10 @@ class TemplateDatasetLoader(metaclass=ABCMeta):
 
         ### if the subject dataset is in the storage
         print(f">>   If {self.parameters.s3_dir} is in the storage")
-        if len(list(filter(lambda x: self.parameters.s3_dir in x, self.s3_io.blob))) == 0:
+        if (
+            len(list(filter(lambda x: self.parameters.s3_dir in x, self.s3_io.blob)))
+            == 0
+        ):
             print(f">>   {self.parameters.s3_dir} was not found in the storage")
             return False
 

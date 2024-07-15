@@ -25,8 +25,11 @@ class TestPickleIO:
         model_file_path = "classifier/vgg_umap/test_data/umap_model.pickle"
         mock_s3_pickle.get_blob()
         print(mock_s3_pickle.blob)
-        assert len([file_path for file_path in mock_s3_pickle.blob if model_file_path]) > 0
+        assert (
+            len([file_path for file_path in mock_s3_pickle.blob if model_file_path]) > 0
+        )
 
         loaded_list = mock_s3_pickle.load(model_file_path)
-#        assert isinstance(loaded_list, list)
 
+
+#        assert isinstance(loaded_list, list)

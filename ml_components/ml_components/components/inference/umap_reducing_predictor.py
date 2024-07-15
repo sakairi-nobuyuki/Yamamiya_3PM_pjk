@@ -48,7 +48,7 @@ class UmapReducingPredictor(TemplatePredictor):
         )
         reduced = self.reducer.fit_transform(scaled_input)
         predicted = self.regression.predict(reduced)
-        return predicted
+        return predicted[0]
 
     def fit_transform(
         self, feat_array: np.ndarray, y: np.ndarray = None
@@ -70,7 +70,9 @@ class UmapReducingPredictor(TemplatePredictor):
             # return self.reducer.fit_transform(feat_array)
             return self.reducer.fit_transform(feat_array)
 
-    def load_models(self, model_path: str) -> List[Union[umap.UMAP, LogisticRegression]]:
+    def load_models(
+        self, model_path: str
+    ) -> List[Union[umap.UMAP, LogisticRegression]]:
         print("downloading UMAP model from ", model_path)
         object_list = self.s3.load(model_path)
 

@@ -33,7 +33,9 @@ class VggLikeFeatureExtractor(TemplatePredictor):
         print("Configuring a feature extractor")
         ### download and load the model, finally delete it.
         if not isinstance(model_factory, ModelFactoryTemplate):
-            raise TypeError(f"{model_factory} model is not that of ModelFactoryTemplate")
+            raise TypeError(
+                f"{model_factory} model is not that of ModelFactoryTemplate"
+            )
 
         # Create a model instance with factory
         self.model = model_factory.create_model()

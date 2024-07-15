@@ -53,11 +53,11 @@ class InferencePipeline:
 
         ### select predictor in accordance with parameters
         print("Configuring the predictor")
-        if self.parameers.type == "binary":
+        if self.parameters.type == "binary":
             print(">> prediction type: binary classification")
             if self.parameters.category == "dnn":
                 print(">> classifier category: vgg")
-                print(">> model path: ", self.parameers.model_path)
+                print(">> model path: ", self.parameters.model_path)
                 model_path = s3_transfer_io.load(self.parameters.model_path)
                 self.predictor = InferenceContext(
                     VggLikeClassifierPredictor(
@@ -67,21 +67,29 @@ class InferencePipeline:
                 os.remove(model_path)
             elif self.parameters.category == "vgg-umap":
                 print(">> classifier category: vgg umap")
-                print(">> model dir path: ", self.parameers.model_path)
+                print(">> model dir path: ", self.parameters.model_path)
 
                 ### download VGG model from cloud storage
                 vgg_model_path = os.path.join(
                     self.parameters.model_path, "feature_extractor.pth"
                 )
                 model_path = s3_transfer_io.load(vgg_model_path)
+                print(f">> model downloaded: {model_path}")
 
                 self.predictor = InferenceContext(
-                    VggLikeUmapPredictor(vgg_model_path["file_name"], self.model_factory)
+                    VggLikeUmapPredictor(
+                        f"{self.parameters.model_path}/feature_extractor.pth",
+                        f"{self.parameters.model_path}/umap_model.pickle",
+                        f"{self.parameters.model_path}/labels.yaml",
+                        # vgg_model_path["file_name"],
+                        self.model_factory,
+                        io_factory,
+                    )
                 )
-                os.remove(vgg_model_path)
+                # os.remove(f"data/{self.parameters.model_path}")
         else:
             raise NotImplementedError(f"{self.parameers.type} is not implemented")
-        os.remove(model_path["file_name"])
+        # os.remove(model_path["file_name"])
 
     def run(self, input: np.ndarray) -> Any:
         return self.predictor.run(input)

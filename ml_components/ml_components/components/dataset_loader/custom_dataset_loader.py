@@ -38,7 +38,9 @@ class CustomDatasetLoader(TemplateDatasetLoader):
         ]
 
         ### get numer of classes
-        label_list = list(set([file_path.split("/")[-2] for file_path in file_path_list]))
+        label_list = list(
+            set([file_path.split("/")[-2] for file_path in file_path_list])
+        )
         print(">> label list: ", label_list)
 
         ### Create file path list of each classes

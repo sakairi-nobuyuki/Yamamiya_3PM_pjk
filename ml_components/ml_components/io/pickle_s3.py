@@ -93,7 +93,7 @@ class PickleIO(IOTemplate):
         file_names = []
         for obj in self.bucket.objects.all():
             if ".pickle" in str(obj.key) or ".pkl" in str(obj.key):
-#            if ".onnx" in str(obj.key):                
+                #            if ".onnx" in str(obj.key):
                 file_names.append(obj.key)
         return file_names
 
