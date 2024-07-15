@@ -27,22 +27,63 @@ class TestVggLikeUmapPredictor:
             secret_key=os.environ["SECRET_KEY"],
         )
     )
+
     def test_init(self) -> None:
-        transfer_s3 = self.io_factory.create(**dict(type="transfer", bucket_name="models"))
+        transfer_s3 = self.io_factory.create(
+            **dict(type="transfer", bucket_name="models")
+        )
         print("blob: ", transfer_s3.blob)
-        assert len([file_path for file_path in transfer_s3.blob if "test_data" in file_path]) > 0
-        assert len([file_path for file_path in transfer_s3.blob if "test_data/labels.yaml" in file_path]) > 0
-        assert len([file_path for file_path in transfer_s3.blob if "test_data/umap_model.pickle" in file_path]) > 0
-        assert len([file_path for file_path in transfer_s3.blob if "test_data/feature_extractor.pth" in file_path]) > 0
+        assert (
+            len(
+                [
+                    file_path
+                    for file_path in transfer_s3.blob
+                    if "test_data" in file_path
+                ]
+            )
+            > 0
+        )
+        assert (
+            len(
+                [
+                    file_path
+                    for file_path in transfer_s3.blob
+                    if "test_data/labels.yaml" in file_path
+                ]
+            )
+            > 0
+        )
+        assert (
+            len(
+                [
+                    file_path
+                    for file_path in transfer_s3.blob
+                    if "test_data/umap_model.pickle" in file_path
+                ]
+            )
+            > 0
+        )
+        assert (
+            len(
+                [
+                    file_path
+                    for file_path in transfer_s3.blob
+                    if "test_data/feature_extractor.pth" in file_path
+                ]
+            )
+            > 0
+        )
 
         model_dir_path_name = "classifier/vgg_umap/test_data"
-        predictor = VggLikeUmapPredictor(f"{model_dir_path_name}/feature_extractor.pth",
-                                         f"{model_dir_path_name}/umap_model.pickle",
-                                         f"{model_dir_path_name}/labels.yaml",
-                                         VggLikeClassifierFactory(), 
-                                         self.io_factory)
+        predictor = VggLikeUmapPredictor(
+            f"{model_dir_path_name}/feature_extractor.pth",
+            f"{model_dir_path_name}/umap_model.pickle",
+            f"{model_dir_path_name}/labels.yaml",
+            VggLikeClassifierFactory(),
+            self.io_factory,
+        )
         assert isinstance(predictor, VggLikeUmapPredictor)
-        
+
 
 @pytest.mark.skip(reason="no longer effective")
 class TestVggLikeUmapPredictorCollapsed:
@@ -83,7 +124,11 @@ class TestVggLikeUmapPredictorCollapsed:
         torch.save(self.checkpoint, self.model_name)
 
         extractor = VggLikeUmapPredictor(
-            self.model_name, self.label_dict, self.factory, self.io_factory, n_layer=n_layer
+            self.model_name,
+            self.label_dict,
+            self.factory,
+            self.io_factory,
+            n_layer=n_layer,
         )
 
         assert isinstance(extractor, VggLikeUmapPredictor)

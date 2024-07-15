@@ -72,7 +72,9 @@ class VggLikeUmapClassifierTrainer(TemplateTrainer):
 
         # set model related things storage
         if save_model_path_base is None:
-            self.save_model_path_base = f"classifier/vgg_umap/{self.__get_current_time()}"
+            self.save_model_path_base = (
+                f"classifier/vgg_umap/{self.__get_current_time()}"
+            )
         else:
             self.save_model_path_base = save_model_path_base
 
@@ -103,7 +105,9 @@ class VggLikeUmapClassifierTrainer(TemplateTrainer):
         label_list = []
 
         print(">> train start: ")
-        print(">> len self.data_path_dict_list_int: ", len(self.data_path_dict_list_int))
+        print(
+            ">> len self.data_path_dict_list_int: ", len(self.data_path_dict_list_int)
+        )
         print(">> feature extraction ")
 
         for train_progress in tqdm(self.data_path_dict_list_int):

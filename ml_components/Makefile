@@ -1,5 +1,6 @@
 SRCS = test ml_components . 
-POETRY_PREFIX = poetry run
+#POETRY_PREFIX = poetry run
+POETRY_PREFIX = rye run
 CONTAINER_NAME = yamamiya-pm-ml
 REGISTORY_NAME = nsakairi
 DEFAULT_TAG = latest

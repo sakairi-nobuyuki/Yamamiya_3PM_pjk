@@ -1,7 +1,8 @@
 # coding: utf-8
 
-from typing import Dict
 import os
+from typing import Dict
+
 import numpy as np
 
 from ...components.factory import IoModuleFactory
@@ -27,10 +28,12 @@ class VggLikeUmapPredictor(TemplatePredictor):
         print(">> n layer: ", n_layer)
 
         ### Load feature extractor model
-        trans_s3=io_factory.create(**dict(type="transfer", bucket_name="models"))
+        trans_s3 = io_factory.create(**dict(type="transfer", bucket_name="models"))
         feature_extractor_path = trans_s3.load(feature_extractor_path)["file_name"]
         print(" >> downloaded feature extractor: ", feature_extractor_path)
-        self.vgg = VggLikeFeatureExtractor(model_factory, n_layer=n_layer, model_path=feature_extractor_path)
+        self.vgg = VggLikeFeatureExtractor(
+            model_factory, n_layer=n_layer, model_path=feature_extractor_path
+        )
         os.remove(feature_extractor_path)
 
         ### load UMAP model
@@ -55,6 +58,7 @@ class VggLikeUmapPredictor(TemplatePredictor):
         """
         feat = self.vgg.predict(image)
         predicted = self.reducer.predict(feat)
+        print("predicted: ", predicted, self.label_dict)
         res = self.label_dict[predicted]
 
         return res

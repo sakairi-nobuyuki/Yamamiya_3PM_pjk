@@ -5,9 +5,7 @@ import os
 from typing import Dict
 
 from ml_components.components.dataloader import BinaryClassifierDataloaderFactory
-from ml_components.components.dataset_loader import (
-    CustomDatasetLoader,
-)
+from ml_components.components.dataset_loader import CustomDatasetLoader
 from ml_components.components.factory import IoModuleFactory
 from ml_components.components.operators import load_train_parameters
 from ml_components.models.factory import VggLikeClassifierFactory
